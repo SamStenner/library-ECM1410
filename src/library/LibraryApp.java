@@ -1,4 +1,4 @@
-import library.Library;
+package library;
 import java.util.ArrayList;
 import java.util.Scanner;
 import java.time.LocalDate;
@@ -84,7 +84,7 @@ public class LibraryApp
                     2010,4);
                     break;
                case 'n': case 'N'://add a new member
-                    lib.addNewMember("Hongping","Cai",LocalDate.now());
+                    lib.addNewMember("Hongping","Cai", LocalDate.now());
                     break;
                case 'c': case 'C'://change the stock for a book
                     lib.changeQuantity("Data Mining",-2);
