@@ -1,0 +1,7 @@
+100001,Data Mining Handbook,Robert Nisbet,1976,10
+100002,Birth of a Theorem,Cedric Villani,1980,2
+100003,Data Scientists at Work,Sebastian Gutierrez,1999,3
+100004,OO Design Using Java,James Nino:Frederick Hosch,1988,3
+100005,Objects First with Java,David Barnes:Michael Kolling,2001,4
+100006,Physics & Philosophy,Werner Heisenberg,1978,4
+100007,Making Software,Andy Oram,1982,5
