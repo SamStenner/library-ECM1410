@@ -1,6 +1,7 @@
 package library;
 
 import java.io.BufferedReader;
+import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -10,7 +11,7 @@ public class Library {
 
     private List<Book> bookshelf = new ArrayList<>();
     private List<Member> memberList = new ArrayList<>();
-    private List<Member> loanList = new ArrayList<>();
+    private List<Loan> loanList = new ArrayList<>();
 
     public Library() {
 
@@ -24,22 +25,42 @@ public class Library {
         }
     }
 
-    public void loadData(String bookData, String memberData, String bookLoanData) throws  Exception{
-        FileReader fr = new FileReader(bookData);
-        BufferedReader br = new BufferedReader(fr);
-        String line;
-        while ((line = br.readLine()) != null) {
-            String[] bookProps = line.split(",");
-            int ID = Integer.parseInt(bookProps[0]);
-            String title = bookProps[1];
-            String[] authors = bookProps[2].split(":");
-            int year = Integer.parseInt(bookProps[3]);
-            int quant = Integer.parseInt(bookProps[4]);
-            Book book = new Book(ID, title, authors, year, quant);
-            bookshelf.add(book);
+    public void loadData(String bookData, String memberData, String bookLoanData) {
+        bookshelf.clear();
+        memberList.clear();
+        loanList.clear();
+        try {
+            FileReader fr = new FileReader(bookData);
+            BufferedReader br = new BufferedReader(fr);
+            String line;
+            while ((line = br.readLine()) != null) {
+                String[] bookProps = line.split(",");
+                int ID = Integer.parseInt(bookProps[0]);
+                String title = bookProps[1];
+                String[] authors = bookProps[2].split(":");
+                int year = Integer.parseInt(bookProps[3]);
+                int quant = Integer.parseInt(bookProps[4]);
+                Book book = new Book(ID, title, authors, year, quant);
+                bookshelf.add(book);
+            }
+
+            fr = new FileReader(bookLoanData);
+            br = new BufferedReader(fr);
+            while ((line = br.readLine()) != null) {
+                String[] loanProps = line.split(",");
+                int loanID = Integer.parseInt(loanProps[0]);
+                int bookID = Integer.parseInt(loanProps[1]);
+                int memberID = Integer.parseInt(loanProps[2]);
+                LocalDate loanDate = LocalDate.parse(loanProps[3]);
+                Loan loan = new Loan(loanID, bookID, memberID, loanDate);
+                loanList.add(loan);
+            }
+        } catch (Exception e) {
+            System.out.println("Could not find data files!");
         }
-        // Read members
-        // Read loans
+
+        // READ MEMBERS TOO!!
+
     }
 
     //region Book Functions
@@ -80,11 +101,15 @@ public class Library {
         return bookshelf;
     }
 
+    public List<Loan> getLoanList(){
+        return loanList;
+    }
+
     //endregion
 
     //region Member Functions
 
-    public void searchMember(String lastName, String foreName) {
+    public void searchMember(String foreName, String lastName) {
 
     }
 
@@ -111,6 +136,7 @@ public class Library {
     public void saveChanges(String bookData, String memberData, String bookLoanData) {
 
     }
+
 
     //endregion
 

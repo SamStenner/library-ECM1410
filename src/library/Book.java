@@ -7,7 +7,7 @@ public class Book {
 
     private int bookID;
     private String bookTitle;
-    private Vector<String> bookAuthors;
+    private String[] bookAuthors;
     private int publishYear;
     private int quantity;
 
@@ -22,16 +22,16 @@ public class Book {
     public Book(int bookID, String bookTitle, String[] bookAuthors, int publishYear, int quantity) {
         this.bookID = bookID;
         this.bookTitle = bookTitle;
-        this.bookAuthors = new Vector<>(Arrays.asList(bookAuthors));
+        this.bookAuthors = bookAuthors;
         this.publishYear = publishYear;
         this.quantity = quantity;
     }
 
     public String[] formatData(){
-        String authors = Arrays.toString(bookAuthors.toArray(new String[bookAuthors.size()]));
+        String bookAuthorsStr = Arrays.toString(bookAuthors);
         String[] data = {Integer.toString(bookID),
                          bookTitle,
-                         authors.substring(1, authors.length()-1),
+                         bookAuthorsStr.substring(1, bookAuthorsStr.length() - 1),
                          Integer.toString(publishYear),
                          Integer.toString(quantity)};
         return data;
