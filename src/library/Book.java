@@ -28,13 +28,37 @@ public class Book {
     }
 
     public String[] formatData(){
-        String bookAuthorsStr = Arrays.toString(bookAuthors);
         String[] data = {Integer.toString(bookID),
                          bookTitle,
-                         bookAuthorsStr.substring(1, bookAuthorsStr.length() - 1),
+                         getBookAuthorsStr(),
                          Integer.toString(publishYear),
                          Integer.toString(quantity)};
         return data;
+    }
+
+    public int getBookID(){
+        return this.bookID;
+    }
+
+    public String getBookTitle(){
+        return this.bookTitle;
+    }
+
+    public String[] getBookAuthors(){
+        return bookAuthors;
+    }
+
+    public String getBookAuthorsStr(){
+        String bookAuthorsStr = Arrays.toString(bookAuthors);
+        return bookAuthorsStr.substring(1, bookAuthorsStr.length() - 1);
+    }
+
+    public int getPublishYear(){
+        return publishYear;
+    }
+
+    public int getQuantity(){
+        return quantity;
     }
 
 }

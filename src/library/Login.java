@@ -26,7 +26,7 @@ public class Login {
         btnRegister.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                main.registerMember(textFirstName.getText(), textFirstName.getText());
+                main.registerMember(textFirstName.getText(), textLastName.getText());
             }
         });
         textLastName.addActionListener(new ActionListener() {

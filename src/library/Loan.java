@@ -24,4 +24,19 @@ public class Loan {
         return data;
     }
 
+    public int getLoanID(){
+        return loanID;
+    }
+
+    public int getBookID(){
+        return bookID;
+    }
+
+    public int getMemberID(){
+        return memberID;
+    }
+
+    public LocalDate getBorrowDate() {
+        return borrowDate;
+    }
 }
