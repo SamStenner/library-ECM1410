@@ -4,6 +4,9 @@ import java.io.*;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.NoSuchElementException;
+import java.util.Scanner;
+import java.util.HashMap;
 
 public class Library {
 
@@ -12,10 +15,11 @@ public class Library {
     private List<Book> bookshelf = new ArrayList<>();
     private List<Member> memberList = new ArrayList<>();
     private List<Loan> loanList = new ArrayList<>();
+    private HashMap<Book, Integer> BookLoanQuant = new HashMap<>();
 
-    private String bookData;
-    private String memberData;
-    private String loanData;
+    private String bookDatFile;
+    private String memberDatFile;
+    private String loanDatFile;
 
     public Library() {
 
@@ -23,9 +27,9 @@ public class Library {
 
     public Library(String bookData, String memberData, String bookLoanData) {
         try {
-            this.bookData = bookData;
-            this.memberData = memberData;
-            this.loanData = bookLoanData;
+            this.bookDatFile = bookData;
+            this.memberDatFile = memberData;
+            this.loanDatFile = bookLoanData;
             loadData();
         } catch (Exception e) {
             e.printStackTrace();
@@ -36,49 +40,76 @@ public class Library {
         bookshelf.clear();
         memberList.clear();
         loanList.clear();
+        
         try {
-            BufferedReader br = new BufferedReader(new FileReader(bookData));
-            String line;
-            while ((line = br.readLine()) != null) {
-                String[] bookProps = line.split(",");
-                int ID = Integer.parseInt(bookProps[0]);
-                String title = bookProps[1];
-                String[] authors = bookProps[2].split(":");
-                int year = Integer.parseInt(bookProps[3]);
-                int quant = Integer.parseInt(bookProps[4]);
-                Book book = new Book(ID, title, authors, year, quant);
-                bookshelf.add(book);
-            }
-            br = new BufferedReader(new FileReader(loanData));
-            while ((line = br.readLine()) != null) {
-                String[] loanProps = line.split(",");
-                int loanID = Integer.parseInt(loanProps[0]);
-                int bookID = Integer.parseInt(loanProps[1]);
-                int memberID = Integer.parseInt(loanProps[2]);
-                LocalDate loanDate = LocalDate.parse(loanProps[3]);
-                Loan loan = new Loan(loanID, bookID, memberID, loanDate);
-                loanList.add(loan);
-            }
-            br = new BufferedReader(new FileReader(memberData));
-            while ((line = br.readLine()) != null) {
-                String[] memberProps = line.split(",");
-                int memberID = Integer.parseInt(memberProps[0]);
-                String memberFirstName = memberProps[1];
-                String memberLastName = memberProps[2];
-                LocalDate registerDate = LocalDate.parse(memberProps[3]);
-                Member member = new Member(memberID, memberFirstName, memberLastName, registerDate);
-                memberList.add(member);
-            }
+            ArrayList<String> lines = MiscOperations.readFile(bookDatFile);
+            bookshelf = MiscOperations.initBooks(lines);
+            lines.clear();
+            lines = MiscOperations.readFile(loanDatFile);
+            loanList = MiscOperations.initLoans(lines);
+            lines.clear();
+            lines = MiscOperations.readFile(memberDatFile);
+            memberList = MiscOperations.initMembers(lines);
+         
         } catch (Exception e) {
-            System.out.println("Could not find data files!");
+            System.out.println("Could not find data files or files corrupted.");
+        }
+        for (Loan loan: loanList){
+            Book lentBook = null;
+            for (Book book: bookshelf){//find book
+                if(book.getBookID() == loan.getBookID()){
+                    lentBook = book;
+                    break;
+                }
+            }
+            if(lentBook != null){
+                if(null != BookLoanQuant.putIfAbsent(lentBook, 1)){
+                    BookLoanQuant.put(lentBook, BookLoanQuant.get(lentBook)+1);
+                }
+            }
         }
 
     }
 
     //region Book Functions
-
-    public List<Book> searchBook(String query) {
-        List<Book> matchingBooks = new ArrayList<>();
+    public void searchBook(){
+        System.out.println("You are now in the book search tool, please enter a"
+                + " book ID, a title or an author.");
+        String query = " ";
+        try{
+            query = MiscOperations.getInput();
+        }
+        catch (InputException e){
+            System.out.println("An error occured while waiting for input. "
+                    + "You will be redirected to the main menu, "
+                    + "then please try again.");
+            return;
+        }
+        ArrayList<Book> results = searchBook(query);
+        if (results.size() > 1){
+            Book result = results.remove(0);
+            System.out.println("Your search result is:");
+            System.out.println(result.toString());
+            System.out.println("Copies available: " + 
+                    ((BookLoanQuant.get(result) == null)
+                    ?result.getQuantity(): 
+                    result.getQuantity()-BookLoanQuant.get(result)));
+            
+        }
+        else{
+            System.out.println("Your search results are:");
+            for(Book book:results){
+                System.out.println(book.toString());
+                
+            }
+        }
+        
+        
+        
+       
+    }
+    public ArrayList<Book> searchBook(String query) {
+        ArrayList<Book> matchingBooks = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
         for (Book book : bookshelf) {
             String bookID = Integer.toString(book.getBookID()).toLowerCase();
@@ -105,7 +136,7 @@ public class Library {
     }
 
     public void borrowBook(String bookTitle, String memberName){
-
+        borrowBook(bookTitle,memberName,LocalDate.now().toString());
     }
 
     public void borrowBook(int bookID, int memberID, String borrowDate){
@@ -141,7 +172,7 @@ public class Library {
     }
 
     public List<Loan> getMemberLoanList(int memberID){
-        List<Loan> memberLoans = new ArrayList<>();
+        ArrayList<Loan> memberLoans = new ArrayList<>();
         for (Loan loan : loanList) {
             if (loan.getMemberID() == memberID) {
                 memberLoans.add(loan);
@@ -155,9 +186,10 @@ public class Library {
     //region Member Functions
 
     public Member searchMember(String foreName, String lastName) {
+        ArrayList<Member> searchResults = new ArrayList<>();
         for (Member member : memberList) {
             if (member.getForeName().equals(foreName) && member.getLastName().equals(lastName)){
-                return member;
+                searchResults.add(member);
             }
         }
         return null;
@@ -166,7 +198,7 @@ public class Library {
     public void addNewMember(String foreName, String lastName,  LocalDate subDate) {
         int newID = memberList.get(memberList.size() - 1).getID() + 1;
         String entry = newID + "," + foreName + "," + lastName + "," + subDate.toString();
-        writeData(memberData, entry);
+        MiscOperations.writeData(memberDatFile, entry);
     }
 
     //endregion
@@ -177,6 +209,7 @@ public class Library {
     public void showAllBooks() {
 
     }
+    
 
     public void showAllMembers() {
 
@@ -190,23 +223,9 @@ public class Library {
 
     }
 
-    public void writeData(String fileData, String text){
-        try {
-            Writer output = new BufferedWriter(new FileWriter(fileData, true));
-            output.append("\n" + text);
-            output.close();
-        } catch (Exception e) {
-            System.out.println("Could not find data files!");
-        }
-    }
-
     //endregion
 
     //region Fucking stupid overloads
-
-    public void searchBook() {
-
-    }
 
     public void searchMember() {
 

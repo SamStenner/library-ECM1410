@@ -60,5 +60,16 @@ public class Book {
     public int getQuantity(){
         return quantity;
     }
+    @Override
+    public String toString(){
+        String authors = "";
+        for(String name: getBookAuthors()){
+            authors += name + " ";
+        }
+        String returnString = String.format("Book ID: %d \nTitle: %s \nAuthors: "
+                + "%s \nYear of publication: %d \nNumber of copies: %d",getBookID(),
+                getBookTitle(), authors,getPublishYear(), getQuantity());
+        return returnString;
+    }
 
 }

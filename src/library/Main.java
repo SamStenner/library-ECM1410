@@ -61,12 +61,9 @@ public class Main {
 
     public Main() {
         lib = new Library(bookData, memberData, loanData);
-        btnLogout.addActionListener(new ActionListener() {
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                mainFrame.dispose();
-                showForm();
-            }
+        btnLogout.addActionListener((ActionEvent e) -> {
+            mainFrame.dispose();
+            showForm();
         });
     }
 
