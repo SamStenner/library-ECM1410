@@ -91,7 +91,7 @@ public class MiscOperations {
         Scanner input = new Scanner(System.in);
         String query = "";
         try{
-            query = input.next();
+            query = input.nextLine();
         }
         catch (NoSuchElementException e){
             throw new InputException("An error occured while waiting for input.", new NoSuchElementException());
