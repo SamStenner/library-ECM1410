@@ -20,6 +20,9 @@ public class Library {
     private String bookDatFile;
     private String memberDatFile;
     private String loanDatFile;
+    
+    private Book selectedBook;
+    private Member selectedMember;
 
     public Library() {
 
@@ -86,27 +89,42 @@ public class Library {
             return;
         }
         ArrayList<Book> results = searchBook(query);
-        if (results.size() > 1){
+        if (results.size() == 1){
             Book result = results.remove(0);
             System.out.println("Your search result is:");
             System.out.println(result.toString());
-            System.out.println("Copies available: " + 
-                    ((BookLoanQuant.get(result) == null)
-                    ?result.getQuantity(): 
-                    result.getQuantity()-BookLoanQuant.get(result)));
-            
+            System.out.println("Copies available: "+getAvailableCopies(result));
         }
-        else{
+        else if (results.size() > 1){
             System.out.println("Your search results are:");
             for(Book book:results){
                 System.out.println(book.toString());
-                
             }
+            System.out.println("Do you want to refine your search? [Y/N]");
+            try{
+                String input = MiscOperations.getInput();
+                if(input.charAt(0) == 'Y' || input.charAt(0) == 'y'){
+                    refineSearchBook(results);
+                }
+                else{
+                    System.out.println("No further search initiated, "
+                            + "you will be redirected to the main menu.");
+                }
+            }
+            catch (InputException e){
+                System.out.println("An error occured with your input.");
+                return;
+            }
+        }   
+        else{
+            System.out.println("There were no books found matching your query.");
+            System.out.println("You will be redirected to the main menu.");
         }
-        
-        
-        
        
+    }
+    
+    public void refineSearchBook(ArrayList<Book> results){
+        System.out.println();
     }
     public ArrayList<Book> searchBook(String query) {
         ArrayList<Book> matchingBooks = new ArrayList<>();
@@ -158,6 +176,10 @@ public class Library {
     public void changeQuantity(String bookTitle, int quantity) {
 
     }
+    
+    public int getAvailableCopies(Book query){
+        return (BookLoanQuant.get(query) == null)? query.getQuantity(): query.getQuantity()-BookLoanQuant.get(query);
+    }
 
     public int getBookshelfSize(){
         return bookshelf.size();
@@ -184,7 +206,9 @@ public class Library {
     //endregion
 
     //region Member Functions
+    public void searchMember() {
 
+    }
     public Member searchMember(String foreName, String lastName) {
         ArrayList<Member> searchResults = new ArrayList<>();
         for (Member member : memberList) {
@@ -223,13 +247,18 @@ public class Library {
 
     }
 
+    public void setSelectedBook(Book selection){
+        this.selectedBook = selection;
+    }
+    
+    public Book getSelectedBook(){
+        return this.selectedBook;
+    }
     //endregion
 
     //region Fucking stupid overloads
 
-    public void searchMember() {
 
-    }
 
     public void borrowBook() {
 
