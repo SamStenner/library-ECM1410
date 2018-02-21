@@ -64,6 +64,11 @@ public class Book {
         this.quantity += delta;
     }
 
+    public String fileEntry(){
+        String entry = bookID + "," + bookTitle + "," + getBookAuthorsStr() + "," + publishYear + "," + quantity;
+        return entry;
+    }
+
     @Override
     public String toString(){
         String returnString = String.format("Book ID: %d \nTitle: %s \nAuthors: "

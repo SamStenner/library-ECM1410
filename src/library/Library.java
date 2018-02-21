@@ -39,7 +39,6 @@ public class Library {
         bookshelf.clear();
         memberList.clear();
         loanList.clear();
-        
         try {
             ArrayList<String> lines = MiscOperations.readFile(bookDatFile);
             bookshelf = MiscOperations.initBooks(lines);
@@ -86,23 +85,20 @@ public class Library {
             return;
         }
         ArrayList<Book> results = searchBook(query);
-<<<<<<< HEAD
-        if (results.size() > 1){ // TODO Max should that be >= 1?
+        if (results.size() > 1) { // TODO Max should that be >= 1?
             Book result = results.remove(0);
             System.out.println("Your search result is:");
             System.out.println(result.toString());
-            System.out.println("Copies available: " + 
+            System.out.println("Copies available: " +
                     ((BookLoanQuant.get(result) == null)
-                    ? result.getQuantity():
-                    result.getQuantity()-BookLoanQuant.get(result)));
-            
-=======
-        if (results.size() == 1){
+                            ? result.getQuantity() :
+                            result.getQuantity() - BookLoanQuant.get(result)));
+        }
+        if (results.size() == 1) {
             Book result = results.remove(0);
             System.out.println("Your search result is:");
             System.out.println(result.toString());
-            System.out.println("Copies available: "+getAvailableCopies(result));
->>>>>>> e67276e88712fc79c4ec23ebd84fadeef0b8b8ae
+            System.out.println("Copies available: " + getAvailableCopies(result));
         }
         else if (results.size() > 1){
             System.out.println("Your search results are:");
@@ -124,8 +120,7 @@ public class Library {
                 System.out.println("An error occured with your input.");
                 return;
             }
-        }   
-        else{
+        } else{
             System.out.println("There were no books found matching your query.");
             System.out.println("You will be redirected to the main menu.");
         }
@@ -135,6 +130,7 @@ public class Library {
     public void refineSearchBook(ArrayList<Book> results){
         System.out.println();
     }
+
     public ArrayList<Book> searchBook(String query) {
         ArrayList<Book> matchingBooks = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
@@ -174,11 +170,11 @@ public class Library {
             int newID = loanList.get(loanList.size() - 1).getLoanID() + 1;
             Loan loan = new Loan(newID, bookID, memberID, borrowDate);
             loanList.add(loan);
-            MiscOperations.writeData(loanDatFile, loan.toString(), true);
             changeQuantity(bookID, -1);
+            MiscOperations.writeData(loanDatFile, loan.toString(), true);
             loadData();
         } else {
-            throw new RuntimeException();
+            throw new RuntimeException("You are already loaning the maximum number of books!");
         }
     }
 
@@ -201,8 +197,26 @@ public class Library {
         }
     }
 
-    public void addNewBook(String bookTitle, String[] authorNames, int publishYear, int numberOfCopies) {
-
+    public void addNewBook(String title, String[] authorNames, int publishYear, int quantity) {
+        if (title.length() > 255) {
+            throw new RuntimeException("Book title is too long!");
+        } else if (authorNames[0] == null) {
+            throw new RuntimeException("There cannot be no authors!");
+        } else if (publishYear > LocalDate.now().getYear()) {
+            throw new RuntimeException("Book must have been already been published!");
+        } else if (quantity < 0) {
+            throw new RuntimeException("Book quantity must be positive!");
+        } else {
+            try {
+                int newID = bookshelf.get(bookshelf.size() - 1).getBookID() + 1;
+                Book newBook = new Book(newID, title, authorNames, publishYear, quantity);
+                String entry = newBook.fileEntry();
+                MiscOperations.writeData(bookDatFile, entry, true);
+                loadData();
+            } catch (Exception e) {
+                throw new RuntimeException("An unknown error has occurred. Please ensure your entries are valid!");
+            }
+        }
     }
 
     public void changeQuantity(String bookTitle, int delta) {
@@ -212,8 +226,12 @@ public class Library {
     public void changeQuantity(int bookID, int delta) {
         for (Book book : bookshelf) {
             if (book.getBookID() == bookID) {
-                book.setQuantity(delta);
-                MiscOperations.writeData(bookDatFile, MiscOperations.booksToString(bookshelf), false);
+                if (book.getQuantity() + delta >= 0) {
+                    book.setQuantity(delta);
+                    MiscOperations.writeData(bookDatFile, MiscOperations.booksToString(bookshelf), false);
+                } else {
+                    throw new RuntimeException("There are no copies of this book available at this time!");
+                }
             }
         }
     }
@@ -237,6 +255,7 @@ public class Library {
     public void searchMember() {
 
     }
+
     public Member searchMember(String foreName, String lastName) {
         for (Member member : memberList) {
             if (member.getForeName().equals(foreName) && member.getLastName().equals(lastName)){
@@ -244,6 +263,19 @@ public class Library {
             }
         }
         return null;
+    }
+
+    public ArrayList<Member> searchMember(String query) {
+        ArrayList<Member> members = new ArrayList<>();
+        query = query == null ? "" : query.toLowerCase();
+        for (Member member : memberList) {
+            String fullName = member.getFullName().toLowerCase();
+            String memberID = Integer.toString(member.getID()).toLowerCase();
+            if (fullName.contains(query) || memberID.contains(query)) {
+                members.add(member);
+            }
+        }
+        return members;
     }
 
     public Member searchMember(int userID) {
@@ -303,6 +335,7 @@ public class Library {
     }
 
     public void setSelectedBook(Book selection){
+        this.selectedBook = selection;
     }
     
     public Book getSelectedBook(){
