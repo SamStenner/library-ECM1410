@@ -4,6 +4,8 @@
  * and open the template in the editor.
  */
 package library;
+import com.oracle.tools.packager.Log;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.FileNotFoundException;
@@ -16,6 +18,10 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
+import java.time.temporal.ChronoUnit;
+
+import static java.time.temporal.ChronoUnit.DAYS;
+
 /**
  *
  * @author maxpr
@@ -63,7 +69,7 @@ public class MiscOperations {
         return bookList;
     }
     
-    public static ArrayList<Loan> initLoans(ArrayList<String> data){//TODO implement Exceptions (numberFormatExceptio, ArrayOutOfBounds)
+    public static ArrayList<Loan> initLoans(ArrayList<String> data){//TODO implement Exceptions (numberFormatException, ArrayOutOfBounds)
         ArrayList<Loan> loanList = new ArrayList<>();
         for  (String line: data){
                 String[] loanProps = line.split(",");
@@ -77,10 +83,11 @@ public class MiscOperations {
         return loanList;
     }
  
-    public static void writeData(String fileData, String text){
+    public static void writeData(String fileData, String text, boolean append){
         try {
-            Writer output = new BufferedWriter(new FileWriter(fileData, true));
-            output.append("\n" + text);
+            text = text.trim();
+            Writer output = new BufferedWriter(new FileWriter(fileData, append));
+            output.append(append ? "\n" + text: text);
             output.close();
         } catch (Exception e) {
             System.out.println("Could not find data files!");
@@ -103,4 +110,49 @@ public class MiscOperations {
             return query;
         }
     }
+
+    public static double calculateFine(LocalDate borrowDate){
+        LocalDate returnDate = borrowDate.plusDays(30);
+        long daysPassed = DAYS.between(returnDate, LocalDate.now());
+        if (daysPassed > 0){
+            return daysPassed * 0.1;
+        }
+        return 0;
+    }
+
+    public static String loansToString(List<Loan> listLoan){
+        String result = "";
+        for (Loan loan : listLoan) {
+            result += loan.toString() + "\n";
+        }
+        return result;
+    }
+
+    public static String booksToString(List<Book> listBook) {
+        String result = "";
+        for (Book book : listBook) {
+            // TODO Requires discussion
+            result += String.join(",", book.formatData()) + "\n";
+        }
+        return result;
+    }
+
+    public static String membersToString(List<Member> listMember) {
+        String result = "";
+        for (Member member : listMember) {
+            result += member.toString() + "\n";
+        }
+        return result;
+    }
+
+    public static int getBooksBorrowed(List<Loan> listLoan, int memberID) {
+        int counter = 0;
+        for (Loan loan : listLoan){
+            if (loan.getMemberID() == memberID) {
+                counter ++;
+            }
+        }
+        return counter;
+    }
+
 }

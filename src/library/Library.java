@@ -2,11 +2,7 @@ package library;
 
 import java.io.*;
 import java.time.LocalDate;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Scanner;
-import java.util.HashMap;
+import java.util.*;
 
 public class Library {
 
@@ -52,6 +48,7 @@ public class Library {
             memberList = MiscOperations.initMembers(lines);
          
         } catch (Exception e) {
+            e.printStackTrace();
             System.out.println("Could not find data files or files corrupted.");
         }
         for (Loan loan: loanList){
@@ -86,13 +83,13 @@ public class Library {
             return;
         }
         ArrayList<Book> results = searchBook(query);
-        if (results.size() > 1){
+        if (results.size() > 1){ // TODO Max should that be >= 1?
             Book result = results.remove(0);
             System.out.println("Your search result is:");
             System.out.println(result.toString());
             System.out.println("Copies available: " + 
                     ((BookLoanQuant.get(result) == null)
-                    ?result.getQuantity(): 
+                    ? result.getQuantity():
                     result.getQuantity()-BookLoanQuant.get(result)));
             
         }
@@ -131,32 +128,64 @@ public class Library {
         return null;
     }
 
-    public void borrowBook(String bookTitle, String memberName, String borrowDate){
-
+    public void borrowBook(String bookTitle, String memberForeName, String memberLastName){
+        borrowBook(bookTitle, memberForeName, memberLastName, LocalDate.now());
     }
 
-    public void borrowBook(String bookTitle, String memberName){
-        borrowBook(bookTitle,memberName,LocalDate.now().toString());
+    public void borrowBook(String bookTitle, String memberForeName, String memberLastName, LocalDate borrowDate){
+        int bookID = searchBook(bookTitle).get(0).getBookID(); //TODO Handle if search fails
+        int memberID = searchMember(memberForeName, memberLastName).getID();
+        borrowBook(bookID, memberID, borrowDate);
     }
 
-    public void borrowBook(int bookID, int memberID, String borrowDate){
-
+    public void borrowBook(int bookID, int memberID, LocalDate borrowDate) {
+        int borrowed = MiscOperations.getBooksBorrowed(loanList, memberID);
+        if (borrowed < 5) {
+            int newID = loanList.get(loanList.size() - 1).getLoanID() + 1;
+            Loan loan = new Loan(newID, bookID, memberID, borrowDate);
+            loanList.add(loan);
+            MiscOperations.writeData(loanDatFile, loan.toString(), true);
+            changeQuantity(bookID, -1);
+            loadData();
+        } else {
+            throw new RuntimeException();
+        }
     }
 
     public void borrowBook(int bookID, int memberID){
-
+        borrowBook(bookID, memberID, LocalDate.now());
     }
 
     public void returnBook(int loanID) {
-
+        int counter = 0;
+        for (Loan loan : loanList) {
+            if (loan.getLoanID() == loanID) {
+                loanList.remove(counter);
+                MiscOperations.writeData(loanDatFile, MiscOperations.loansToString(loanList), false);
+                Book returnBook = searchBook(loan.getBookID());
+                changeQuantity(returnBook.getBookTitle(),  1);
+                loadData();
+                return;
+            }
+            counter++;
+        }
     }
 
     public void addNewBook(String bookTitle, String[] authorNames, int publishYear, int numberOfCopies) {
 
     }
 
-    public void changeQuantity(String bookTitle, int quantity) {
+    public void changeQuantity(String bookTitle, int delta) {
+        changeQuantity(searchBook(bookTitle).get(0).getBookID(), delta); //TODO Handle if search fails
+    }
 
+    public void changeQuantity(int bookID, int delta) {
+        for (Book book : bookshelf) {
+            if (book.getBookID() == bookID) {
+                book.setQuantity(delta);
+                MiscOperations.writeData(bookDatFile, MiscOperations.booksToString(bookshelf), false);
+            }
+        }
     }
 
     public int getBookshelfSize(){
@@ -165,6 +194,35 @@ public class Library {
 
     public List<Book> getBookshelf(){
         return bookshelf;
+    }
+
+
+    //endregion
+
+    //region Member Functions
+
+    public Member searchMember(String foreName, String lastName) {
+        for (Member member : memberList) {
+            if (member.getForeName().equals(foreName) && member.getLastName().equals(lastName)){
+                return member;
+            }
+        }
+        return null;
+    }
+
+    public Member searchMember(int userID) {
+        for (Member member : memberList) {
+            if (member.getID() == userID){
+                return member;
+            }
+        }
+        return null;
+    }
+
+    public void addNewMember(String foreName, String lastName,  LocalDate subDate) {
+        int newID = memberList.get(memberList.size() - 1).getID() + 1;
+        String entry = newID + "," + foreName + "," + lastName + "," + subDate.toString();
+        MiscOperations.writeData(memberDatFile, entry, true);
     }
 
     public List<Loan> getLoanList(){
@@ -181,24 +239,8 @@ public class Library {
         return memberLoans;
     }
 
-    //endregion
-
-    //region Member Functions
-
-    public Member searchMember(String foreName, String lastName) {
-        ArrayList<Member> searchResults = new ArrayList<>();
-        for (Member member : memberList) {
-            if (member.getForeName().equals(foreName) && member.getLastName().equals(lastName)){
-                searchResults.add(member);
-            }
-        }
-        return null;
-    }
-
-    public void addNewMember(String foreName, String lastName,  LocalDate subDate) {
-        int newID = memberList.get(memberList.size() - 1).getID() + 1;
-        String entry = newID + "," + foreName + "," + lastName + "," + subDate.toString();
-        MiscOperations.writeData(memberDatFile, entry);
+    public List<Member> getAllMembers() {
+        return memberList;
     }
 
     //endregion
@@ -209,7 +251,6 @@ public class Library {
     public void showAllBooks() {
 
     }
-    
 
     public void showAllMembers() {
 
@@ -220,7 +261,9 @@ public class Library {
     }
 
     public void saveChanges(String bookData, String memberData, String bookLoanData) {
-
+        MiscOperations.writeData(bookData, MiscOperations.booksToString(bookshelf), false);
+        MiscOperations.writeData(memberData, MiscOperations.membersToString(memberList), false);
+        MiscOperations.writeData(bookLoanData, MiscOperations.loansToString(loanList), false);
     }
 
     //endregion

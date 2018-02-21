@@ -45,21 +45,25 @@ public class Book {
     }
 
     public String[] getBookAuthors(){
-        return bookAuthors;
+        return this.bookAuthors;
     }
 
     public String getBookAuthorsStr(){
-        String bookAuthorsStr = Arrays.toString(bookAuthors);
-        return bookAuthorsStr.substring(1, bookAuthorsStr.length() - 1);
+        return String.join(":", this.bookAuthors);
     }
 
     public int getPublishYear(){
-        return publishYear;
+        return this.publishYear;
     }
 
     public int getQuantity(){
-        return quantity;
+        return this.quantity;
     }
+
+    public void setQuantity(int delta) {
+        this.quantity += delta;
+    }
+
     @Override
     public String toString(){
         String authors = "";

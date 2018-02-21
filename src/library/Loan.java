@@ -1,6 +1,7 @@
 package library;
 
 import java.time.LocalDate;
+import java.util.Arrays;
 
 public class Loan {
 
@@ -39,4 +40,10 @@ public class Loan {
     public LocalDate getBorrowDate() {
         return borrowDate;
     }
+
+    @Override
+    public String toString(){
+        return String.join(",", formatData());
+    }
+
 }

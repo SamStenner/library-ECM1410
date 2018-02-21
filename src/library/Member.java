@@ -24,12 +24,29 @@ public class Member {
         return lastName;
     }
 
+    public String getFullName(){
+        return this.foreName + " " + this.lastName;
+    }
+
     public int getID(){
         return this.memberID;
     }
 
     public LocalDate getRegisterDate(){
         return registerDate;
+    }
+
+    public String[] formatData(){
+        String[] data = {Integer.toString(memberID),
+                         foreName,
+                         lastName,
+                         registerDate.toString()};
+        return data;
+    }
+
+    @Override
+    public String toString(){
+            return String.join(",", formatData());
     }
 
 }
