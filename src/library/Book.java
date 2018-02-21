@@ -66,13 +66,9 @@ public class Book {
 
     @Override
     public String toString(){
-        String authors = "";
-        for(String name: getBookAuthors()){
-            authors += name + " ";
-        }
         String returnString = String.format("Book ID: %d \nTitle: %s \nAuthors: "
                 + "%s \nYear of publication: %d \nNumber of copies: %d",getBookID(),
-                getBookTitle(), authors,getPublishYear(), getQuantity());
+                getBookTitle(), getBookAuthorsStr(),getPublishYear(), getQuantity());
         return returnString;
     }
 
