@@ -1,8 +1,5 @@
 package library;
 
-import java.util.Arrays;
-import java.util.Vector;
-
 public class Book {
 
     private int bookID;
@@ -12,10 +9,6 @@ public class Book {
     private int quantity;
 
     public Book() {
-
-    }
-
-    public Book(String bookTitle){
 
     }
 
@@ -30,7 +23,7 @@ public class Book {
     public String[] formatData(){
         String[] data = {Integer.toString(bookID),
                          bookTitle,
-                         getBookAuthorsStr(),
+                         getBookAuthors(true),
                          Integer.toString(publishYear),
                          Integer.toString(quantity)};
         return data;
@@ -44,12 +37,8 @@ public class Book {
         return this.bookTitle;
     }
 
-    public String[] getBookAuthors(){
-        return this.bookAuthors;
-    }
-
-    public String getBookAuthorsStr(){
-        return String.join(":", this.bookAuthors);
+    public String getBookAuthors(boolean niceFormat){
+        return String.join(niceFormat ? ", " : ":", this.bookAuthors);
     }
 
     public int getPublishYear(){
@@ -64,17 +53,24 @@ public class Book {
         this.quantity += delta;
     }
 
-    public String fileEntry(){
-        String entry = bookID + "," + bookTitle + "," + getBookAuthorsStr() + "," + publishYear + "," + quantity;
-        return entry;
+    public String formedString(){
+        String returnString = String.format("Book ID: %d " +
+                        "\nTitle: %s " +
+                        "\nAuthors: %s " +
+                        "\nYear of publication: %d " +
+                        "\nNumber of copies: %d",
+                        getBookID(),
+                        getBookTitle(),
+                        getBookAuthors(true),
+                        getPublishYear(),
+                        getQuantity());
+        return returnString;
     }
 
     @Override
     public String toString(){
-        String returnString = String.format("Book ID: %d \nTitle: %s \nAuthors: "
-                + "%s \nYear of publication: %d \nNumber of copies: %d",getBookID(),
-                getBookTitle(), getBookAuthorsStr(),getPublishYear(), getQuantity());
-        return returnString;
+        String entry = bookID + "," + bookTitle + "," + getBookAuthors(false) + "," + publishYear + "," + quantity;
+        return entry;
     }
 
 }

@@ -4,21 +4,14 @@
  * and open the template in the editor.
  */
 package library;
-import com.oracle.tools.packager.Log;
 
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.FileNotFoundException;
-import java.io.FileReader;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.Writer;
+import java.io.*;
+import java.time.DateTimeException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Scanner;
-import java.time.temporal.ChronoUnit;
 
 import static java.time.temporal.ChronoUnit.DAYS;
 
@@ -29,49 +22,72 @@ import static java.time.temporal.ChronoUnit.DAYS;
  */
 public class MiscOperations {
         
-    public static ArrayList<String> readFile(String fileName) 
-            throws FileNotFoundException, IOException{
-            BufferedReader br = new BufferedReader(new FileReader(fileName));
-            String line;
-            ArrayList<String> fileData = new ArrayList<>();  
-            while ((line = br.readLine()) != null){
-                fileData.add(line);
-            }
-            return fileData;
+    public static List<String> readFile(String fileName) throws IOException{
+        ArrayList<String> fileData = new ArrayList<>();
+        BufferedReader br = new BufferedReader(new FileReader(fileName));
+        String line;
+        while ((line = br.readLine()) != null) {
+            fileData.add(line);
+        }
+        return fileData;
     }
-    
-    public static ArrayList<Member> initMembers(ArrayList<String> data){
+
+    public static List<Member> initMembers(String filename) {
         ArrayList<Member> memberList = new ArrayList<>();
-         for  (String line: data){
+        try {
+            List<String> data = readFile(filename);
+            for (String line : data) {
                 String[] memberProps = line.split(",");
-                int memberID = Integer.parseInt(memberProps[0]);          //TODO implement Exceptioncase; (NumberFormatException)
-                String memberFirstName = memberProps[1];                  //TODO implement Exceptioncase; (ArrayOutOfBounds)
-                String memberLastName = memberProps[2];                   //TODO implement Exceptioncase; (ArrayOutOfBounds)
-                LocalDate registerDate = LocalDate.parse(memberProps[3]); //TODO implement Exceptioncase; (ArrayOutOfBounds, DateTimeParseException) 
+                int memberID = Integer.parseInt(memberProps[0]);
+                String memberFirstName = memberProps[1];
+                String memberLastName = memberProps[2];
+                LocalDate registerDate = LocalDate.parse(memberProps[3]);
                 Member member = new Member(memberID, memberFirstName, memberLastName, registerDate);
                 memberList.add(member);
             }
-         return memberList;   
+        } catch (IOException ex) {
+            System.out.println("Error: Could not load members: " + ex.getMessage());
+        } catch (NumberFormatException ex) {
+            System.out.println("Error: Member ID incorrectly formatted!");
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println("Error: Missing member data!");
+        } catch (DateTimeException ex) {
+            System.out.println("Error: Member join date invalid!");
+        } finally {
+            return memberList;
+        }
     }
     
-    public static ArrayList<Book> initBooks(ArrayList<String> data){ //TODO implement Exceptions, ArrayOutOfBounds, NumberFormatException
-        ArrayList<Book> bookList = new ArrayList<>();        
-        for  (String line: data){
+    public static List<Book> initBooks(String filename) {
+        ArrayList<Book> bookList = new ArrayList<>();
+        try {
+            List<String> data = readFile(filename);
+            for (String line : data) {
                 String[] bookProps = line.split(",");
                 int ID = Integer.parseInt(bookProps[0]);
                 String title = bookProps[1];
                 String[] authors = bookProps[2].split(":");
                 int year = Integer.parseInt(bookProps[3]);
-                int quant = Integer.parseInt(bookProps[4]);
-                Book book = new Book(ID, title, authors, year, quant);
+                int quantity = Integer.parseInt(bookProps[4]);
+                Book book = new Book(ID, title, authors, year, quantity);
                 bookList.add(book);
             }
-        return bookList;
+        } catch (IOException ex) {
+            System.out.println("Error: Could not load books: " + ex.getMessage());
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println("Error: Missing book data!");
+        } catch (NumberFormatException ex) {
+            System.out.println("Error: Book data incorrectly formatted!");
+        } finally {
+            return bookList;
+        }
     }
     
-    public static ArrayList<Loan> initLoans(ArrayList<String> data){//TODO implement Exceptions (numberFormatException, ArrayOutOfBounds)
+    public static List<Loan> initLoans(String filename) {
         ArrayList<Loan> loanList = new ArrayList<>();
-        for  (String line: data){
+        try {
+            List<String> data = readFile(filename);
+            for (String line : data) {
                 String[] loanProps = line.split(",");
                 int loanID = Integer.parseInt(loanProps[0]);
                 int bookID = Integer.parseInt(loanProps[1]);
@@ -79,8 +95,17 @@ public class MiscOperations {
                 LocalDate loanDate = LocalDate.parse(loanProps[3]);
                 Loan loan = new Loan(loanID, bookID, memberID, loanDate);
                 loanList.add(loan);
+            }
+        } catch (IOException ex) {
+            System.out.println("Error: Could not load loans: " + ex.getMessage());
+        } catch (ArrayIndexOutOfBoundsException ex) {
+            System.out.println("Error: Missing loan data!");
+        } catch (NumberFormatException ex) {
+            System.out.println("Error: Loan data incorrectly formatted!");
         }
-        return loanList;
+        finally {
+            return loanList;
+        }
     }
  
     public static void writeData(String fileData, String text, boolean append){
@@ -89,7 +114,7 @@ public class MiscOperations {
             Writer output = new BufferedWriter(new FileWriter(fileData, append));
             output.append(append ? "\n" + text: text);
             output.close();
-        } catch (Exception e) {
+        } catch (Exception ex) {
             System.out.println("Could not find data files!");
         }
     }
@@ -100,10 +125,10 @@ public class MiscOperations {
         try{
             query = input.nextLine();
         }
-        catch (NoSuchElementException e){
+        catch (NoSuchElementException ex){
             throw new InputException("An error occured while waiting for input.", new NoSuchElementException());
         }
-        catch (Exception e){
+        catch (Exception ex){
             throw new InputException("An error occured while waiting for input.", null);
         }
         finally{
@@ -115,32 +140,15 @@ public class MiscOperations {
         LocalDate returnDate = borrowDate.plusDays(30);
         long daysPassed = DAYS.between(returnDate, LocalDate.now());
         if (daysPassed > 0){
-            return daysPassed * 0.1;
+            return Math.round(daysPassed * 0.1 * 100.0) / 100.0;
         }
         return 0;
     }
 
-    public static String loansToString(List<Loan> listLoan){
+    public static String listToString(List<Object> list){
         String result = "";
-        for (Loan loan : listLoan) {
-            result += loan.toString() + "\n";
-        }
-        return result;
-    }
-
-    public static String booksToString(List<Book> listBook) {
-        String result = "";
-        for (Book book : listBook) {
-            // TODO Requires discussion
-            result += String.join(",", book.formatData()) + "\n";
-        }
-        return result;
-    }
-
-    public static String membersToString(List<Member> listMember) {
-        String result = "";
-        for (Member member : listMember) {
-            result += member.toString() + "\n";
+        for (Object object : list) {
+            result += object.toString() + "\n";
         }
         return result;
     }

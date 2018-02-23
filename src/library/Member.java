@@ -44,6 +44,18 @@ public class Member {
         return data;
     }
 
+    public String formedString() {
+        String returnString = String.format("Member ID: %d " +
+                        "\nFirst Name: %s " +
+                        "\nLast Name: %s " +
+                        "\nRegister Date: %s",
+                        getID(),
+                        getForeName(),
+                        getLastName(),
+                        getRegisterDate().toString());
+        return returnString;
+    }
+
     @Override
     public String toString(){
             return String.join(",", formatData());

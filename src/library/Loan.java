@@ -1,7 +1,6 @@
 package library;
 
 import java.time.LocalDate;
-import java.util.Arrays;
 
 public class Loan {
 
@@ -39,6 +38,18 @@ public class Loan {
 
     public LocalDate getBorrowDate() {
         return borrowDate;
+    }
+
+    public String formedString(){
+        String returnString = String.format("Loan ID: %d " +
+                        "\nBook ID: %d " +
+                        "\nMember ID: %d " +
+                        "\nBorrow Date: %s",
+                        getLoanID(),
+                        getBookID(),
+                        getMemberID(),
+                        getBorrowDate().toString());
+        return returnString;
     }
 
     @Override

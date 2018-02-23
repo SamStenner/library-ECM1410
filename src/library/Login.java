@@ -5,14 +5,20 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
 public class Login {
+
+    //region Used UI Elements
     public JPanel panelLogin;
     private JTextField textLastName;
     private JTextField textFirstName;
+    private JButton btnLogin;
+    private JButton btnRegister;
+    //endregion
+
+    //region Unused UI Elements
     private JLabel lblFirstName;
     private JLabel lblLastName;
-    private JButton btnLogin;
     private JLabel lblLogin;
-    private JButton btnRegister;
+    //endregion
 
     public Login(Main main){
 

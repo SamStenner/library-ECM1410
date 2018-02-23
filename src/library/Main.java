@@ -1,98 +1,82 @@
 package library;
 
 import javax.swing.*;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import javax.swing.event.ListSelectionEvent;
-import javax.swing.event.ListSelectionListener;
+import javax.swing.event.*;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableColumnModel;
-import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.ComponentAdapter;
 import java.time.LocalDate;
 import java.util.List;
 
-import static javax.swing.UIManager.getInstalledLookAndFeels;
-
 public class Main {
-    private JPanel panelMain;
+
+    //region Used UI Elements
+    public JPanel panelMain;
     private JTable tableBooks;
     private JTextField txtSearch;
-    private JButton btnLoan;
-    private JButton btnAdd;
+    private JButton btnLoanBook;
+    private JButton btnAddBook;
     private JButton btnDelBook;
-    private JButton btnReturn;
-    private JButton btnEdit;
+    private JButton btnReturnBook;
+    private JButton btnEditQuantity;
     private JButton btnSave;
     private JButton btnReload;
     private JLabel lblMatches;
+    private JTabbedPane tabAreas;
+    private JLabel lblForeName;
+    private JLabel lblLastName;
+    private JTable tableLoans;
+    private JLabel lblCreatedDate;
+    private JButton btnLogout;
+    private JButton btnLoanDetails;
+    private JLabel lblAccountID;
+    private JTable tableAllMembers;
+    private JTable tableAllLoans;
+    private JButton btnAllLoanDetails;
+    private JButton btnDelLoan;
+    private JTextField txtSearchMembers;
+    private JButton btnClearBookSearch;
+    //endregion
+
+    //region Unused UI Elements
     private JPanel panelButtons;
     private JLabel lblSearchBooks;
     private JScrollPane scrollPaneBooks;
-    private JTabbedPane tabAreas;
     private JPanel tabBooks;
     private JPanel tabMembers;
     private JLabel lblForeNameHeader;
     private JLabel lblLastNameHeader;
-    private JLabel lblForeName;
-    private JLabel lblLastName;
     private JPanel panelAccountDetails;
-    private JTable tableLoans;
     private JLabel lblAccountDetails;
     private JLabel lblCreatedDateHeader;
-    private JLabel lblCreatedDate;
     private JScrollPane scrollPaneLoans;
     private JLabel lblLoans;
-    private JButton btnLogout;
-    private JButton btnLoanDetails;
     private JLabel lblAccountIDHeader;
-    private JLabel lblAccountID;
     private JPanel tabAdmin;
-    private JTable tableAllMembers;
-    private JTable tableAllLoans;
     private JLabel lblAllMembers;
     private JLabel lblAllLoans;
-    private JButton btnAllLoanDetails;
-    private JButton btnDelLoan;
     private JPanel panelSearch;
-    private JTextField txtSearchMembers;
-    private JButton btnClearBooks;
-    private JButton btnClearMembers;
+    private JButton btnClearMemberSearch;
     private JLabel lblSearchMembers;
+    //endregion
 
-    private String bookData = "data/books.txt";
-    private String memberData = "data/members.txt";
-    private String loanData = "data/bookloans.txt";
-
-    private static JFrame loginFrame;
-    private static JFrame mainFrame;
-
-    private Member currentMember;
-
-    private List<Loan> listLoans;
+    private JFrame loginFrame;
+    public JFrame mainFrame;
 
     private Book selectedBook;
     private Loan selectedLoan;
+    private Member currentUser;
 
     private Library lib;
 
-    public Main() {
-        lib = new Library(bookData, memberData, loanData);
-        btnLogout.addActionListener((ActionEvent e) -> {
-            mainFrame.dispose();
-            showForm();
-        });
+    public Main(Library lib){
+        this.lib = lib;
     }
 
-    public static void main(String[] args){
-        showForm();
-    }
-
-    public static void showLogin(Main main){
+    public void showLogin(){
         loginFrame = new JFrame("Login");
-        loginFrame.setContentPane(new Login(main).panelLogin);
+        loginFrame.setContentPane(new Login(this).panelLogin);
         loginFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         loginFrame.setSize(400, 300);
         loginFrame.setVisible(true);
@@ -120,27 +104,7 @@ public class Main {
             loanFrame.setVisible(true);
             loanFrame.toFront();
         } else {
-            JOptionPane.showMessageDialog(null, "No loan selected!");
-        }
-    }
-
-    public static void showForm() {
-        setStyle(1);
-        Main main = new Main();
-        mainFrame = new JFrame("Library Project");
-        mainFrame.setContentPane(main.panelMain);
-        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        mainFrame.setSize(700, 450);
-        mainFrame.setVisible(true);
-        mainFrame.setEnabled(false);
-        showLogin(main);
-    }
-
-    public static void setStyle(int style){
-        try {
-            UIManager.setLookAndFeel(UIManager.getInstalledLookAndFeels()[style].getClassName());
-        } catch (Exception e) {
-            e.printStackTrace();
+            JOptionPane.showMessageDialog(null, "No loan selected!", "Warning", JOptionPane.WARNING_MESSAGE);
         }
     }
 
@@ -184,9 +148,9 @@ public class Main {
     }
 
     public void configLoanTable() {
-        listLoans = lib.getMemberLoanList(currentMember.getID());
+        List<Loan> listLoans = lib.getMemberLoanList(currentUser.getID());
         DefaultTableModel model = (DefaultTableModel) tableLoans.getModel();
-        String[] columnNames = {"Loan ID", "Book ID", "Member ID", "Loan Date", "Return Date"};
+        String[] columnNames = {"Loan ID", "Book Title", "Member ID", "Loan Date", "Return Date"};
         createTableColumns(model, columnNames);
         addLoanRows(model, listLoans);
         TableColumnModel tcm = tableLoans.getColumnModel();
@@ -202,7 +166,7 @@ public class Main {
     public void configAllLoansTable() {
         List<Loan> listAllLoans = lib.getLoanList();
         DefaultTableModel model = (DefaultTableModel) tableAllLoans.getModel();
-        String[] columnNames = {"Loan ID", "Book ID", "Member ID", "Loan Date", "Return Date"};
+        String[] columnNames = {"Loan ID", "Book Title", "Member ID", "Loan Date", "Return Date"};
         createTableColumns(model, columnNames);
         addLoanRows(model, listAllLoans);
         tableAllLoans.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -257,62 +221,92 @@ public class Main {
     }
 
     private void showAccountDetails(){
-        lblAccountID.setText(Integer.toString(currentMember.getID()));
-        lblForeName.setText(currentMember.getForeName());
-        lblLastName.setText(currentMember.getLastName());
-        lblCreatedDate.setText(currentMember.getRegisterDate().toString());
+        lblAccountID.setText(Integer.toString(currentUser.getID()));
+        lblForeName.setText(currentUser.getForeName());
+        lblLastName.setText(currentUser.getLastName());
+        lblCreatedDate.setText(currentUser.getRegisterDate().toString());
     }
 
     private void configForm(){
 
         configInterface();
 
-        btnClearBooks.addActionListener(new ActionListener() {
+        btnClearBookSearch.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 txtSearch.setText(null);
             }
         });
 
-        btnLoan.addActionListener(new ActionListener() {
+        btnLoanBook.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedBook != null) {
                     try {
                         Book loaningBook = selectedBook;
-                        lib.borrowBook(loaningBook.getBookID(), currentMember.getID());
-                        lib.loadData();
+                        lib.borrowBook(loaningBook, currentUser);
                         configInterface();
-                        JOptionPane.showMessageDialog(null, "Successfully loaned book:\n" + loaningBook.getBookTitle());
-                    } catch (RuntimeException re){
-                        JOptionPane.showMessageDialog(null, re.getMessage());
+                        JOptionPane.showMessageDialog(null, "Successfully loaned book:\n" + loaningBook.getBookTitle(), "Loan", JOptionPane.INFORMATION_MESSAGE);
+                    } catch (RuntimeException ex){
+                        JOptionPane.showMessageDialog(null, ex.getMessage(), "Loan", JOptionPane.ERROR_MESSAGE);
                     }
                 } else {
-                    JOptionPane.showMessageDialog(null, "No book selected!");
+                    JOptionPane.showMessageDialog(null, "No book selected!", "Warning", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
 
-        btnReturn.addActionListener(new ActionListener() {
+        btnReturnBook.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedLoan != null) {
-                    if (MiscOperations.calculateFine(selectedLoan.getBorrowDate()) > 0) {
-                        JOptionPane.showMessageDialog(null, "You must pay a fine first!");
-                        return;
+                    double fine = MiscOperations.calculateFine(selectedLoan.getBorrowDate());
+                    if (fine > 0) {
+                        int result = JOptionPane.showConfirmDialog(null,
+                                "You have an outstanding fine of: £" + String.format("%.2f", fine)  + "\nPay now?");
+                        switch (result){
+                            case JOptionPane.YES_OPTION:
+                                try {
+                                    int cashOrCard = JOptionPane.showOptionDialog(
+                                            null,
+                                            "How would you like to pay the fine?",
+                                            "Payment method",
+                                            JOptionPane.YES_NO_OPTION,
+                                            JOptionPane.QUESTION_MESSAGE,
+                                            null,
+                                            new Object[]{"Cash", "Card"},
+                                            null);
+                                    if (cashOrCard != JOptionPane.CANCEL_OPTION) {
+                                        Book returnBook = lib.searchBook(selectedLoan.getBookID());
+                                        lib.payFineAndReturn(fine, selectedLoan, cashOrCard);
+                                        configInterface();
+                                        JOptionPane.showMessageDialog(null, "Successfully returned book:\n" + returnBook.getBookTitle(), "Loan", JOptionPane.INFORMATION_MESSAGE);
+                                    } else {
+                                        return;
+                                    }
+                                } catch (RuntimeException ex) {
+                                    JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Loan", JOptionPane.ERROR_MESSAGE);
+                                }
+                                break;
+                            case JOptionPane.NO_OPTION:
+                                JOptionPane.showMessageDialog(null, "Cannot continue until the fine is paid!", "Loan", JOptionPane.WARNING_MESSAGE);
+                                return;
+                            case JOptionPane.CANCEL_OPTION:
+                                return;
+                        }
+                    } else {
+                        Book returnBook = lib.searchBook(selectedLoan.getBookID());
+                        lib.returnBook(selectedLoan);
+                        configInterface();
+                        JOptionPane.showMessageDialog(null, "Successfully returned book:\n" + returnBook.getBookTitle(), "Loan", JOptionPane.INFORMATION_MESSAGE);
                     }
-                    Book returnBook = lib.searchBook(selectedLoan.getBookID());
-                    lib.returnBook(selectedLoan.getLoanID());
-                    lib.loadData();
-                    configInterface();
-                    JOptionPane.showMessageDialog(null, "Successfully returned book:\n" + returnBook.getBookTitle());
                 } else {
-                    JOptionPane.showMessageDialog(null, "No loan selected!");
+                    JOptionPane.showMessageDialog(null, "No loan selected!", "Loan", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
 
-        btnAdd.addActionListener(new ActionListener() {
+        btnAddBook.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 showAddBook();
@@ -322,15 +316,50 @@ public class Main {
         btnDelBook.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "REMOVING");
+                if (selectedBook != null) {
+                    lib.removeBook(selectedBook);
+                    configInterface();
+                    JOptionPane.showMessageDialog(null, "Removed book successfully!", "Book", JOptionPane.INFORMATION_MESSAGE);
+                } else {
+                    JOptionPane.showMessageDialog(null, "No book selected!", "Book", JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 
-        btnEdit.addActionListener(new ActionListener() {
+        btnEditQuantity.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "EDITING");
-                lib.changeQuantity();
+                if (selectedBook != null) {
+                    int result = JOptionPane.showOptionDialog(
+                            null,
+                            null,
+                            "Quantity Editor",
+                            JOptionPane.YES_NO_OPTION,
+                            JOptionPane.PLAIN_MESSAGE,
+                            null,
+                            new Object[]{"Set quantity", "Change quantity"},
+                            null);
+                    if (result == -1) {
+                        return;
+                    }
+                    boolean setQuantity = result == JOptionPane.YES_OPTION;
+                    String inputQuantity = JOptionPane.showInputDialog("Please enter quantity:");
+                    if (inputQuantity != "") {
+                        try {
+                            Integer quantity = Integer.parseInt(inputQuantity);
+                            if (setQuantity) {
+                                lib.setQuantity(selectedBook, quantity);
+                            } else {
+                                lib.changeQuantity(selectedBook, quantity);
+                            }
+                            configBookTable();
+                        } catch (RuntimeException ex) {
+                            JOptionPane.showMessageDialog(null, ex.getMessage(), "Book", JOptionPane.ERROR_MESSAGE);
+                        }
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(null, "No book selected!", "Book", JOptionPane.WARNING_MESSAGE);
+                }
             }
         });
 
@@ -352,11 +381,10 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedLoan != null) {
-                    lib.returnBook(selectedLoan.getLoanID());
-                    lib.loadData();
+                    lib.returnBook(selectedLoan);
                     configInterface();
                 } else {
-                    JOptionPane.showMessageDialog(null, "No loan selected!");
+                    JOptionPane.showMessageDialog(null, "No loan selected!", "Loan", JOptionPane.WARNING_MESSAGE);
                 }
             }
         });
@@ -364,8 +392,8 @@ public class Main {
         btnSave.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-                JOptionPane.showMessageDialog(null, "SAVING");
-                lib.saveChanges(bookData, memberData, loanData);
+                lib.saveChanges();
+                JOptionPane.showMessageDialog(null, "Saved successfully!", "Files", JOptionPane.INFORMATION_MESSAGE);
             }
         });
 
@@ -374,7 +402,24 @@ public class Main {
             public void actionPerformed(ActionEvent e) {
                 lib.loadData();
                 configInterface();
-                JOptionPane.showMessageDialog(null, "Reloaded from file!");
+                JOptionPane.showMessageDialog(null, "Reloaded from file!", "Files", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
+        btnLogout.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                mainFrame.dispose();
+                lib.showUI();
+            }
+        });
+
+        tabAreas.addChangeListener(new ChangeListener() {
+            @Override
+            public void stateChanged(ChangeEvent e) {
+                selectedLoan = null;
+                tableLoans.clearSelection();
+                tableAllLoans.clearSelection();
             }
         });
     }
@@ -403,11 +448,11 @@ public class Main {
             Book book = lib.searchBook(loan.getBookID());
             Member member = lib.searchMember(loan.getMemberID());
             String loanID = Integer.toString(loan.getLoanID());
-            String bookID = Integer.toString(book.getBookID());
+            String bookTitle = book.getBookTitle();
             String memberID = Integer.toString(member.getID());
             String borrowDate = loan.getBorrowDate().toString();
             String returnDate = loan.getBorrowDate().plusDays(30).toString();
-            String[] rowData = {loanID, bookID, memberID, borrowDate, returnDate};
+            String[] rowData = {loanID, bookTitle, memberID, borrowDate, returnDate};
             model.addRow(rowData);
         }
     }
@@ -425,29 +470,29 @@ public class Main {
     }
 
     public void submitCredentials(String foreName, String lastName) {
-        Member loginMember = lib.searchMember(foreName, lastName);
-        if (loginMember != null) {
+        currentUser = lib.searchMember(foreName, lastName);
+        if (currentUser != null) {
             mainFrame.setEnabled(true);
             loginFrame.dispose();
-            currentMember = loginMember;
             configForm();
         } else {
-            JOptionPane.showMessageDialog(null, "Couldn't find member!");
+            JOptionPane.showMessageDialog(null, "Couldn't find member!", "Login", JOptionPane.ERROR_MESSAGE);
         }
     }
 
     public void registerMember(String foreName, String lastName) {
         Member loginMember = lib.searchMember(foreName, lastName);
         if (loginMember == null) {
-            lib.addNewMember(foreName, lastName, LocalDate.now());
-            lib.loadData();
-            submitCredentials(foreName, lastName);
+            try {
+                lib.addNewMember(foreName, lastName, LocalDate.now());
+                lib.loadData();
+                submitCredentials(foreName, lastName);
+            } catch (Exception ex) {
+                JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Register", JOptionPane.ERROR_MESSAGE);
+            }
         } else {
-            JOptionPane.showMessageDialog(null, "Member already exists!");
+            JOptionPane.showMessageDialog(null, "Member already exists!", "Register", JOptionPane.ERROR_MESSAGE);
         }
     }
 
-    private void createUIComponents() {
-        // TODO: place custom component creation code here
-    }
 }

@@ -1,3 +1,5 @@
+package library;
+
 import library.Library;
 import java.util.ArrayList;
 import java.util.Scanner;
@@ -16,8 +18,7 @@ public class LibraryApp
      *
      * @param args String array for input
      */
-    public static void main(String[] args)
-    {  
+    public static void main(String[] args) {
        // STEP1: initiate the library by loading data from 3 text files
        System.out.println("**************************************************");
        System.out.println("* Loading data ...");
@@ -30,7 +31,7 @@ public class LibraryApp
        
        // STEP2: test the library system
        System.out.println("\n* Start testing ...\n");
-       boolean isFixInput = false;
+       boolean isFixInput = true;
        if (isFixInput){
            // OPTION 1: Test the library system with fixed input.
            // When you start programming, you may pick this test mode.
@@ -47,7 +48,6 @@ public class LibraryApp
        System.out.println("* Save the changes ...");
        System.out.println("**************************************************");
        lib.saveChanges("data/books.txt","data/members.txt","data/bookloans.txt");
-       
        System.out.println("Bye ...");  
     } 
     
@@ -67,7 +67,7 @@ public class LibraryApp
            inChar = getUserInput(); 
            switch (inChar){
                case 's': case 'S'://search for one book
-                    lib.searchBook("java");
+                    lib.searchBook("Java");
                     break;
                case 'i': case 'I'://search for member information
                     lib.searchMember("Sarah","Hoopern");
@@ -84,7 +84,7 @@ public class LibraryApp
                     2010,4);
                     break;
                case 'n': case 'N'://add a new member
-                    lib.addNewMember("Hongping","Cai",LocalDate.now());
+                    lib.addNewMember("Hongping","Cai", LocalDate.now());
                     break;
                case 'c': case 'C'://change the stock for a book
                     lib.changeQuantity("Data Mining",-2);
@@ -146,6 +146,7 @@ public class LibraryApp
             }
        } while ((!isValidInput)||(moreRequirement));
     }
+
     /**
      * Display all functions of the library management system.
      * Get the user's input (one character from a list of characters)
@@ -168,6 +169,7 @@ public class LibraryApp
         char inchar = in.next().charAt(0);
         return inchar;
     }
+
     /**
      * After finishing one service, ask the user if any other requirements
      *

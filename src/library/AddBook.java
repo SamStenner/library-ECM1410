@@ -3,21 +3,25 @@ package library;
 import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.lang.reflect.Method;
-import java.util.concurrent.Callable;
 
 public class AddBook {
-    private JLabel lblHeader;
-    private JLabel lblTitle;
-    private JLabel lblAuthors;
-    private JLabel lblPublished;
-    private JLabel lblQuantity;
+
+    //region Used UI Elements
     private JTextField txtTitle;
     private JTextField txtAuthors;
     private JTextField txtPublished;
     private JTextField txtQuantity;
     private JButton btnSubmit;
     public JPanel panelAddBook;
+    //endregion
+
+    //region Unused UI Elements
+    private JLabel lblHeader;
+    private JLabel lblTitle;
+    private JLabel lblAuthors;
+    private JLabel lblPublished;
+    private JLabel lblQuantity;
+    //endregion
 
     public AddBook(Library lib, JFrame thisFrame, Main main) {
 
@@ -31,19 +35,14 @@ public class AddBook {
                     }
                     int published = Integer.parseInt(txtPublished.getText());
                     int quantity = Integer.parseInt(txtQuantity.getText());
-                    try {
-                        lib.addNewBook(txtTitle.getText(), authors , published, quantity);
-                        main.configBookTable();
-                        thisFrame.dispose();
-                    } catch (RuntimeException re) {
-                        JOptionPane.showMessageDialog(null, re.getMessage());
-                    }
+                    lib.addNewBook(txtTitle.getText(), authors , published, quantity);
+                    main.configBookTable();
+                    thisFrame.dispose();
                 } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(null, "Book details not entered correctly!");
+                    JOptionPane.showMessageDialog(null, "Book details not entered correctly:\n" + ex.getClass().getSimpleName(), "Add Book", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
     }
-
 
 }
