@@ -33,8 +33,8 @@
               <folding>
                 <element signature="docComment;class#LibraryApp#0" expanded="false" />
                 <element signature="docComment;method#main#0;class#LibraryApp#0" expanded="false" />
-                <element signature="e#1199#1253#0" expanded="false" />
-                <element signature="e#1392#1453#0" expanded="false" />
+                <element signature="e#1200#1254#0" expanded="false" />
+                <element signature="e#1393#1454#0" expanded="false" />
                 <element signature="docComment;method#testWithFixInput#0;class#LibraryApp#0" expanded="false" />
                 <element signature="docComment;method#testWithKeyboardInput#0;class#LibraryApp#0" expanded="false" />
                 <element signature="method#testWithKeyboardInput#0;class#LibraryApp#0" expanded="false" />
@@ -180,14 +180,15 @@
       <file leaf-file-name="Library.java" pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/src/library/Library.java">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="553">
-              <caret line="494" column="23" lean-forward="false" selection-start-line="494" selection-start-column="23" selection-end-line="494" selection-end-column="23" />
+            <state relative-caret-position="612">
+              <caret line="651" column="5" lean-forward="false" selection-start-line="651" selection-start-column="5" selection-end-line="651" selection-end-column="5" />
               <folding>
                 <element signature="method#Library#0;class#Library#0" expanded="false" />
                 <element signature="method#loadData#0;class#Library#0" expanded="false" />
-                <element signature="e#1929#1952#0" expanded="false" />
+                <element signature="e#1972#1995#0" expanded="false" />
                 <element signature="method#searchBook#0;class#Library#0" expanded="false" />
                 <element signature="method#searchBook#1;class#Library#0" expanded="false" />
+                <element signature="method#searchBook#2;class#Library#0" expanded="false" />
                 <element signature="method#searchBookExact#0;class#Library#0" expanded="false" />
                 <element signature="method#borrowBook#0;class#Library#0" expanded="false" />
                 <element signature="method#borrowBook#1;class#Library#0" expanded="false" />
@@ -200,33 +201,25 @@
                 <element signature="method#changeQuantity#2;class#Library#0" expanded="false" />
                 <element signature="method#setQuantity#0;class#Library#0" expanded="false" />
                 <element signature="method#getAvailableCopies#0;class#Library#0" expanded="false" />
-                <element signature="n#!!doc;n#searchMember#0;n#Library#0" expanded="false" />
-                <element signature="method#searchMember#0;class#Library#0" expanded="false" />
+                <element signature="e#15926#15951#0" expanded="false" />
                 <element signature="method#searchMemberExact#0;class#Library#0" expanded="false" />
+                <element signature="method#searchMember#0;class#Library#0" expanded="false" />
                 <element signature="method#searchMember#1;class#Library#0" expanded="false" />
                 <element signature="method#searchMember#2;class#Library#0" expanded="false" />
-                <element signature="method#searchMember#3;class#Library#0" expanded="false" />
                 <element signature="method#addNewMember#0;class#Library#0" expanded="false" />
                 <element signature="method#getMemberLoanList#0;class#Library#0" expanded="false" />
                 <element signature="method#outputMemberLoans#0;class#Library#0" expanded="false" />
                 <element signature="method#renewLoan#0;class#Library#0" expanded="false" />
+                <element signature="e#19842#19855#0" expanded="false" />
+                <element signature="method#payFine#0;class#Library#0" expanded="false" />
                 <element signature="method#showAllBooks#0;class#Library#0" expanded="false" />
                 <element signature="method#showAllMembers#0;class#Library#0" expanded="false" />
                 <element signature="method#showAllBookLoans#0;class#Library#0" expanded="false" />
                 <element signature="method#cancelAddBook#0;class#Library#0" expanded="false" />
                 <element signature="method#paidFine#0;class#Library#0" expanded="false" />
                 <element signature="method#saveChanges#0;class#Library#0" expanded="false" />
-                <element signature="e#22893#22894#0" expanded="true" />
-                <element signature="e#22952#22953#0" expanded="true" />
-                <element signature="e#22976#23007#0" expanded="false" />
-                <element signature="method#searchBook#2;class#Library#0" expanded="false" />
-                <element signature="e#25231#25232#0" expanded="true" />
-                <element signature="e#25267#25268#0" expanded="true" />
-                <element signature="method#borrowBook#4;class#Library#0" expanded="false" />
-                <element signature="method#returnBook#2;class#Library#0" expanded="false" />
-                <element signature="method#addNewBook#1;class#Library#0" expanded="false" />
-                <element signature="method#addNewMember#1;class#Library#0" expanded="false" />
-                <element signature="method#changeQuantity#3;class#Library#0" expanded="false" />
+                <element signature="method#searchBook#3;class#Library#0" expanded="false" />
+                <element signature="method#refineSearchBook#0;class#Library#0" expanded="false" />
                 <element signature="method#showGUI#0;class#Library#0" expanded="false" />
               </folding>
             </state>
@@ -361,8 +354,8 @@
     </navigator>
     <panes>
       <pane id="PackagesPane" />
-      <pane id="Scope" />
       <pane id="Scratches" />
+      <pane id="Scope" />
       <pane id="ProjectPane">
         <subPane>
           <expand>
@@ -618,6 +611,7 @@
   </component>
   <component name="ToolWindowManager">
     <frame x="-8" y="-8" width="1936" height="1056" extended-state="6" />
+    <editor active="true" />
     <layout>
       <window_info id="Palette" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="3" side_tool="false" content_ui="tabs" />
       <window_info id="TODO" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="6" side_tool="false" content_ui="tabs" />
@@ -628,7 +622,7 @@
       <window_info id="Version Control" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="8" side_tool="false" content_ui="tabs" />
       <window_info id="Terminal" active="false" anchor="bottom" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.32934782" sideWeight="0.5" order="9" side_tool="false" content_ui="tabs" />
       <window_info id="Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="2" side_tool="false" content_ui="tabs" />
-      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2196162" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
+      <window_info id="Project" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="true" show_stripe_button="true" weight="0.2217484" sideWeight="0.5" order="0" side_tool="false" content_ui="combo" />
       <window_info id="Structure" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="Ant Build" active="false" anchor="right" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.25" sideWeight="0.5" order="1" side_tool="false" content_ui="tabs" />
       <window_info id="UI Designer" active="false" anchor="left" auto_hide="false" internal_type="DOCKED" type="DOCKED" visible="false" show_stripe_button="true" weight="0.33" sideWeight="0.5" order="4" side_tool="false" content_ui="tabs" />
@@ -660,9 +654,10 @@
           <folding>
             <element signature="method#Library#0;class#Library#0" expanded="false" />
             <element signature="method#loadData#0;class#Library#0" expanded="false" />
-            <element signature="e#1929#1952#0" expanded="false" />
+            <element signature="e#1972#1995#0" expanded="false" />
             <element signature="method#searchBook#0;class#Library#0" expanded="false" />
             <element signature="method#searchBook#1;class#Library#0" expanded="false" />
+            <element signature="method#searchBook#2;class#Library#0" expanded="false" />
             <element signature="method#searchBookExact#0;class#Library#0" expanded="false" />
             <element signature="method#borrowBook#0;class#Library#0" expanded="false" />
             <element signature="method#borrowBook#1;class#Library#0" expanded="false" />
@@ -675,33 +670,25 @@
             <element signature="method#changeQuantity#2;class#Library#0" expanded="false" />
             <element signature="method#setQuantity#0;class#Library#0" expanded="false" />
             <element signature="method#getAvailableCopies#0;class#Library#0" expanded="false" />
-            <element signature="n#!!doc;n#searchMember#0;n#Library#0" expanded="false" />
-            <element signature="method#searchMember#0;class#Library#0" expanded="false" />
+            <element signature="e#15926#15951#0" expanded="false" />
             <element signature="method#searchMemberExact#0;class#Library#0" expanded="false" />
+            <element signature="method#searchMember#0;class#Library#0" expanded="false" />
             <element signature="method#searchMember#1;class#Library#0" expanded="false" />
             <element signature="method#searchMember#2;class#Library#0" expanded="false" />
-            <element signature="method#searchMember#3;class#Library#0" expanded="false" />
             <element signature="method#addNewMember#0;class#Library#0" expanded="false" />
             <element signature="method#getMemberLoanList#0;class#Library#0" expanded="false" />
             <element signature="method#outputMemberLoans#0;class#Library#0" expanded="false" />
             <element signature="method#renewLoan#0;class#Library#0" expanded="false" />
+            <element signature="e#19842#19855#0" expanded="false" />
+            <element signature="method#payFine#0;class#Library#0" expanded="false" />
             <element signature="method#showAllBooks#0;class#Library#0" expanded="false" />
             <element signature="method#showAllMembers#0;class#Library#0" expanded="false" />
             <element signature="method#showAllBookLoans#0;class#Library#0" expanded="false" />
             <element signature="method#cancelAddBook#0;class#Library#0" expanded="false" />
             <element signature="method#paidFine#0;class#Library#0" expanded="false" />
             <element signature="method#saveChanges#0;class#Library#0" expanded="false" />
-            <element signature="e#22893#22894#0" expanded="true" />
-            <element signature="e#22952#22953#0" expanded="true" />
-            <element signature="e#22976#23007#0" expanded="false" />
-            <element signature="method#searchBook#2;class#Library#0" expanded="false" />
-            <element signature="e#25231#25232#0" expanded="true" />
-            <element signature="e#25267#25268#0" expanded="true" />
-            <element signature="method#borrowBook#4;class#Library#0" expanded="false" />
-            <element signature="method#returnBook#2;class#Library#0" expanded="false" />
-            <element signature="method#addNewBook#1;class#Library#0" expanded="false" />
-            <element signature="method#addNewMember#1;class#Library#0" expanded="false" />
-            <element signature="method#changeQuantity#3;class#Library#0" expanded="false" />
+            <element signature="method#searchBook#3;class#Library#0" expanded="false" />
+            <element signature="method#refineSearchBook#0;class#Library#0" expanded="false" />
             <element signature="method#showGUI#0;class#Library#0" expanded="false" />
           </folding>
         </state>
@@ -852,9 +839,10 @@
           <folding>
             <element signature="method#Library#0;class#Library#0" expanded="false" />
             <element signature="method#loadData#0;class#Library#0" expanded="false" />
-            <element signature="e#1929#1952#0" expanded="false" />
+            <element signature="e#1972#1995#0" expanded="false" />
             <element signature="method#searchBook#0;class#Library#0" expanded="false" />
             <element signature="method#searchBook#1;class#Library#0" expanded="false" />
+            <element signature="method#searchBook#2;class#Library#0" expanded="false" />
             <element signature="method#searchBookExact#0;class#Library#0" expanded="false" />
             <element signature="method#borrowBook#0;class#Library#0" expanded="false" />
             <element signature="method#borrowBook#1;class#Library#0" expanded="false" />
@@ -867,33 +855,25 @@
             <element signature="method#changeQuantity#2;class#Library#0" expanded="false" />
             <element signature="method#setQuantity#0;class#Library#0" expanded="false" />
             <element signature="method#getAvailableCopies#0;class#Library#0" expanded="false" />
-            <element signature="n#!!doc;n#searchMember#0;n#Library#0" expanded="false" />
-            <element signature="method#searchMember#0;class#Library#0" expanded="false" />
+            <element signature="e#15926#15951#0" expanded="false" />
             <element signature="method#searchMemberExact#0;class#Library#0" expanded="false" />
+            <element signature="method#searchMember#0;class#Library#0" expanded="false" />
             <element signature="method#searchMember#1;class#Library#0" expanded="false" />
             <element signature="method#searchMember#2;class#Library#0" expanded="false" />
-            <element signature="method#searchMember#3;class#Library#0" expanded="false" />
             <element signature="method#addNewMember#0;class#Library#0" expanded="false" />
             <element signature="method#getMemberLoanList#0;class#Library#0" expanded="false" />
             <element signature="method#outputMemberLoans#0;class#Library#0" expanded="false" />
             <element signature="method#renewLoan#0;class#Library#0" expanded="false" />
+            <element signature="e#19842#19855#0" expanded="false" />
+            <element signature="method#payFine#0;class#Library#0" expanded="false" />
             <element signature="method#showAllBooks#0;class#Library#0" expanded="false" />
             <element signature="method#showAllMembers#0;class#Library#0" expanded="false" />
             <element signature="method#showAllBookLoans#0;class#Library#0" expanded="false" />
             <element signature="method#cancelAddBook#0;class#Library#0" expanded="false" />
             <element signature="method#paidFine#0;class#Library#0" expanded="false" />
             <element signature="method#saveChanges#0;class#Library#0" expanded="false" />
-            <element signature="e#22893#22894#0" expanded="true" />
-            <element signature="e#22952#22953#0" expanded="true" />
-            <element signature="e#22976#23007#0" expanded="false" />
-            <element signature="method#searchBook#2;class#Library#0" expanded="false" />
-            <element signature="e#25231#25232#0" expanded="true" />
-            <element signature="e#25267#25268#0" expanded="true" />
-            <element signature="method#borrowBook#4;class#Library#0" expanded="false" />
-            <element signature="method#returnBook#2;class#Library#0" expanded="false" />
-            <element signature="method#addNewBook#1;class#Library#0" expanded="false" />
-            <element signature="method#addNewMember#1;class#Library#0" expanded="false" />
-            <element signature="method#changeQuantity#3;class#Library#0" expanded="false" />
+            <element signature="method#searchBook#3;class#Library#0" expanded="false" />
+            <element signature="method#refineSearchBook#0;class#Library#0" expanded="false" />
             <element signature="method#showGUI#0;class#Library#0" expanded="false" />
           </folding>
         </state>
@@ -1107,8 +1087,8 @@
           <folding>
             <element signature="docComment;class#LibraryApp#0" expanded="false" />
             <element signature="docComment;method#main#0;class#LibraryApp#0" expanded="false" />
-            <element signature="e#1199#1253#0" expanded="false" />
-            <element signature="e#1392#1453#0" expanded="false" />
+            <element signature="e#1200#1254#0" expanded="false" />
+            <element signature="e#1393#1454#0" expanded="false" />
             <element signature="docComment;method#testWithFixInput#0;class#LibraryApp#0" expanded="false" />
             <element signature="docComment;method#testWithKeyboardInput#0;class#LibraryApp#0" expanded="false" />
             <element signature="method#testWithKeyboardInput#0;class#LibraryApp#0" expanded="false" />
@@ -1238,14 +1218,15 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/src/library/Library.java">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="553">
-          <caret line="494" column="23" lean-forward="false" selection-start-line="494" selection-start-column="23" selection-end-line="494" selection-end-column="23" />
+        <state relative-caret-position="612">
+          <caret line="651" column="5" lean-forward="false" selection-start-line="651" selection-start-column="5" selection-end-line="651" selection-end-column="5" />
           <folding>
             <element signature="method#Library#0;class#Library#0" expanded="false" />
             <element signature="method#loadData#0;class#Library#0" expanded="false" />
-            <element signature="e#1929#1952#0" expanded="false" />
+            <element signature="e#1972#1995#0" expanded="false" />
             <element signature="method#searchBook#0;class#Library#0" expanded="false" />
             <element signature="method#searchBook#1;class#Library#0" expanded="false" />
+            <element signature="method#searchBook#2;class#Library#0" expanded="false" />
             <element signature="method#searchBookExact#0;class#Library#0" expanded="false" />
             <element signature="method#borrowBook#0;class#Library#0" expanded="false" />
             <element signature="method#borrowBook#1;class#Library#0" expanded="false" />
@@ -1258,33 +1239,25 @@
             <element signature="method#changeQuantity#2;class#Library#0" expanded="false" />
             <element signature="method#setQuantity#0;class#Library#0" expanded="false" />
             <element signature="method#getAvailableCopies#0;class#Library#0" expanded="false" />
-            <element signature="n#!!doc;n#searchMember#0;n#Library#0" expanded="false" />
-            <element signature="method#searchMember#0;class#Library#0" expanded="false" />
+            <element signature="e#15926#15951#0" expanded="false" />
             <element signature="method#searchMemberExact#0;class#Library#0" expanded="false" />
+            <element signature="method#searchMember#0;class#Library#0" expanded="false" />
             <element signature="method#searchMember#1;class#Library#0" expanded="false" />
             <element signature="method#searchMember#2;class#Library#0" expanded="false" />
-            <element signature="method#searchMember#3;class#Library#0" expanded="false" />
             <element signature="method#addNewMember#0;class#Library#0" expanded="false" />
             <element signature="method#getMemberLoanList#0;class#Library#0" expanded="false" />
             <element signature="method#outputMemberLoans#0;class#Library#0" expanded="false" />
             <element signature="method#renewLoan#0;class#Library#0" expanded="false" />
+            <element signature="e#19842#19855#0" expanded="false" />
+            <element signature="method#payFine#0;class#Library#0" expanded="false" />
             <element signature="method#showAllBooks#0;class#Library#0" expanded="false" />
             <element signature="method#showAllMembers#0;class#Library#0" expanded="false" />
             <element signature="method#showAllBookLoans#0;class#Library#0" expanded="false" />
             <element signature="method#cancelAddBook#0;class#Library#0" expanded="false" />
             <element signature="method#paidFine#0;class#Library#0" expanded="false" />
             <element signature="method#saveChanges#0;class#Library#0" expanded="false" />
-            <element signature="e#22893#22894#0" expanded="true" />
-            <element signature="e#22952#22953#0" expanded="true" />
-            <element signature="e#22976#23007#0" expanded="false" />
-            <element signature="method#searchBook#2;class#Library#0" expanded="false" />
-            <element signature="e#25231#25232#0" expanded="true" />
-            <element signature="e#25267#25268#0" expanded="true" />
-            <element signature="method#borrowBook#4;class#Library#0" expanded="false" />
-            <element signature="method#returnBook#2;class#Library#0" expanded="false" />
-            <element signature="method#addNewBook#1;class#Library#0" expanded="false" />
-            <element signature="method#addNewMember#1;class#Library#0" expanded="false" />
-            <element signature="method#changeQuantity#3;class#Library#0" expanded="false" />
+            <element signature="method#searchBook#3;class#Library#0" expanded="false" />
+            <element signature="method#refineSearchBook#0;class#Library#0" expanded="false" />
             <element signature="method#showGUI#0;class#Library#0" expanded="false" />
           </folding>
         </state>
