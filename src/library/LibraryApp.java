@@ -73,10 +73,10 @@ public class LibraryApp
                     lib.searchMember("Sarah","Hoopern");
                     break;
                case 'b': case 'B'://borrow one book
-                    lib.borrowBook("Data","Jodan","Cooper");
+                    lib.borrowBook("Data S","Jordan","Coaoper");
                     break;
                case 'r': case 'R'://return one book via the book loan Id
-                    lib.returnBook(300002);
+                    lib.returnBook(300001);
                     break;
                case 'a': case 'A'://add a new book
                     String [] authorNames = new String [] {"Jaideva Goswami"};

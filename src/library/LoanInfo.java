@@ -59,7 +59,7 @@ public class LoanInfo {
         boolean fined = fine > 0;
         lblOverdue.setText(fined ? "Yes" : "No");
         if (fined) {
-            lblFine.setText("£" + String.format("%.2f", fine));
+            lblFine.setText(MiscOperations.fineToString(fine));
         } else {
             lblFineHeader.setEnabled(false);
             lblFineHeader.setVisible(false);

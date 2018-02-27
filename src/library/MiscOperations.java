@@ -145,6 +145,15 @@ public class MiscOperations {
         return 0;
     }
 
+    public static String fineToString(double fine) {
+        return  fine > 0 ? "£" + String.format("%.2f", fine) : "-";
+    }
+
+    public static String fineToString(LocalDate borrowDate){
+        double fine = calculateFine(borrowDate);
+        return fineToString(fine);
+    }
+
     public static String listToString(List<Object> list){
         String result = "";
         for (Object object : list) {

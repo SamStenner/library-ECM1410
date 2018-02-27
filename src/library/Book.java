@@ -1,12 +1,14 @@
 package library;
 
+import java.util.List;
+
 public class Book {
 
     private int bookID;
     private String bookTitle;
     private String[] bookAuthors;
     private int publishYear;
-    private int quantity;
+    private int quantityTotal;
 
     public Book() {
 
@@ -17,15 +19,16 @@ public class Book {
         this.bookTitle = bookTitle;
         this.bookAuthors = bookAuthors;
         this.publishYear = publishYear;
-        this.quantity = quantity;
+        this.quantityTotal= quantity;
     }
 
-    public String[] formatData(){
+    public String[] formatData(List<Loan> loanList){
         String[] data = {Integer.toString(bookID),
                          bookTitle,
                          getBookAuthors(true),
                          Integer.toString(publishYear),
-                         Integer.toString(quantity)};
+                         Integer.toString(getAvailable(loanList)),
+                         Integer.toString(quantityTotal)};
         return data;
     }
 
@@ -45,31 +48,43 @@ public class Book {
         return this.publishYear;
     }
 
-    public int getQuantity(){
-        return this.quantity;
-    }
-
     public void setQuantity(int delta) {
-        this.quantity += delta;
+        quantityTotal += delta;
     }
 
-    public String formedString(){
+    public int getQuantityTotal(){
+        return quantityTotal;
+    }
+
+    public int getAvailable(List<Loan> loanList) {
+        int quantity = getQuantityTotal();
+        for (Loan loan : loanList) {
+            if (loan.getBookID() == getBookID()) {
+                quantity--;
+            }
+        }
+        return quantity;
+    }
+
+    public String formedString(List<Loan> loanList){
         String returnString = String.format("Book ID: %d " +
                         "\nTitle: %s " +
                         "\nAuthors: %s " +
                         "\nYear of publication: %d " +
-                        "\nNumber of copies: %d",
+                        "\nNumber available: %d" +
+                        "\nTotal quantity: %d",
                         getBookID(),
                         getBookTitle(),
                         getBookAuthors(true),
                         getPublishYear(),
-                        getQuantity());
+                        getAvailable(loanList),
+                        getQuantityTotal());
         return returnString;
     }
 
     @Override
     public String toString(){
-        String entry = bookID + "," + bookTitle + "," + getBookAuthors(false) + "," + publishYear + "," + quantity;
+        String entry = bookID + "," + bookTitle + "," + getBookAuthors(false) + "," + publishYear + "," + quantityTotal;
         return entry;
     }
 

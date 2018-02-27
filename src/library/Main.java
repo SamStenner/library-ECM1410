@@ -12,7 +12,7 @@ import java.util.List;
 public class Main {
 
     //region Used UI Elements
-    public JPanel panelMain;
+    private JPanel panelMain;
     private JTable tableBooks;
     private JTextField txtSearch;
     private JButton btnLoanBook;
@@ -59,6 +59,8 @@ public class Main {
     private JPanel panelSearch;
     private JButton btnClearMemberSearch;
     private JLabel lblSearchMembers;
+    private JButton btnRenewBook;
+    private JButton btnRenewLoanAdmin;
     //endregion
 
     private JFrame loginFrame;
@@ -72,6 +74,12 @@ public class Main {
 
     public Main(Library lib){
         this.lib = lib;
+        mainFrame = new JFrame("Library Mangement System");
+        mainFrame.setContentPane(panelMain);
+        mainFrame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        mainFrame.setSize(700, 450);
+        mainFrame.setVisible(true);
+        mainFrame.setEnabled(false);
     }
 
     public void showLogin(){
@@ -126,7 +134,7 @@ public class Main {
             }
         });
         DefaultTableModel model = (DefaultTableModel) tableBooks.getModel();
-        String[] columnNames = {"Book ID", "Title", "Authors", "Publish Date", "Quantity"};
+        String[] columnNames = {"Book ID", "Title", "Authors", "Publish Date", "Num Available", "Total Quantity"};
         createTableColumns(model, columnNames);
         updateBookTable( null);
         List<Book> bookshelf = lib.getBookshelf();
@@ -136,7 +144,7 @@ public class Main {
                 int selectedRow = tableBooks.getSelectedRow();
                 if (selectedRow != -1) {
                     for (Book book : bookshelf) {
-                        String[] bookData = book.formatData();
+                        String[] bookData = book.formatData(lib.getLoanList());
                         if (bookData[0].equals(tableBooks.getModel().getValueAt(selectedRow, 0))) {
                             selectedBook = book;
                         }
@@ -150,7 +158,7 @@ public class Main {
     public void configLoanTable() {
         List<Loan> listLoans = lib.getMemberLoanList(currentUser.getID());
         DefaultTableModel model = (DefaultTableModel) tableLoans.getModel();
-        String[] columnNames = {"Loan ID", "Book Title", "Member ID", "Loan Date", "Return Date"};
+        String[] columnNames = {"Loan ID", "Book Title", "Member Name", "Loan Date", "Return Date", "Late Fine"};
         createTableColumns(model, columnNames);
         addLoanRows(model, listLoans);
         TableColumnModel tcm = tableLoans.getColumnModel();
@@ -166,7 +174,7 @@ public class Main {
     public void configAllLoansTable() {
         List<Loan> listAllLoans = lib.getLoanList();
         DefaultTableModel model = (DefaultTableModel) tableAllLoans.getModel();
-        String[] columnNames = {"Loan ID", "Book Title", "Member ID", "Loan Date", "Return Date"};
+        String[] columnNames = {"Loan ID", "Book Title", "Member Name", "Loan Date", "Return Date", "Late Fine"};
         createTableColumns(model, columnNames);
         addLoanRows(model, listAllLoans);
         tableAllLoans.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
@@ -205,7 +213,8 @@ public class Main {
         model.setRowCount(0);
         List<Book> books = lib.searchBook(query);
         for (Book book : books) {
-            model.addRow(book.formatData());
+            String[] data = book.formatData(lib.getLoanList());
+            model.addRow(data);
         }
         int matches = books.size();
         lblMatches.setText(txtSearch.getText().equals("") ? "" : "Matching Results: " + matches);
@@ -256,50 +265,29 @@ public class Main {
             }
         });
 
+        btnRenewBook.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (selectedLoan.getFine() > 0) {
+                    if (!paidFine(selectedLoan)) {
+                        return;
+                    }
+                }
+                lib.renewLoan(selectedLoan);
+                lib.loadData();
+                configInterface();
+                JOptionPane.showMessageDialog(null,
+                        "Book successfully renewed!");
+            }
+        });
+
         btnReturnBook.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedLoan != null) {
-                    double fine = MiscOperations.calculateFine(selectedLoan.getBorrowDate());
-                    if (fine > 0) {
-                        int result = JOptionPane.showConfirmDialog(null,
-                                "You have an outstanding fine of: £" + String.format("%.2f", fine)  + "\nPay now?");
-                        switch (result){
-                            case JOptionPane.YES_OPTION:
-                                try {
-                                    int cashOrCard = JOptionPane.showOptionDialog(
-                                            null,
-                                            "How would you like to pay the fine?",
-                                            "Payment method",
-                                            JOptionPane.YES_NO_OPTION,
-                                            JOptionPane.QUESTION_MESSAGE,
-                                            null,
-                                            new Object[]{"Cash", "Card"},
-                                            null);
-                                    if (cashOrCard != JOptionPane.CANCEL_OPTION) {
-                                        Book returnBook = lib.searchBook(selectedLoan.getBookID());
-                                        lib.payFineAndReturn(fine, selectedLoan, cashOrCard);
-                                        configInterface();
-                                        JOptionPane.showMessageDialog(null, "Successfully returned book:\n" + returnBook.getBookTitle(), "Loan", JOptionPane.INFORMATION_MESSAGE);
-                                    } else {
-                                        return;
-                                    }
-                                } catch (RuntimeException ex) {
-                                    JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Loan", JOptionPane.ERROR_MESSAGE);
-                                }
-                                break;
-                            case JOptionPane.NO_OPTION:
-                                JOptionPane.showMessageDialog(null, "Cannot continue until the fine is paid!", "Loan", JOptionPane.WARNING_MESSAGE);
-                                return;
-                            case JOptionPane.CANCEL_OPTION:
-                                return;
-                        }
-                    } else {
-                        Book returnBook = lib.searchBook(selectedLoan.getBookID());
-                        lib.returnBook(selectedLoan);
-                        configInterface();
-                        JOptionPane.showMessageDialog(null, "Successfully returned book:\n" + returnBook.getBookTitle(), "Loan", JOptionPane.INFORMATION_MESSAGE);
-                    }
+                    lib.returnBook(selectedLoan);
+                    lib.loadData();
+                    configInterface();
                 } else {
                     JOptionPane.showMessageDialog(null, "No loan selected!", "Loan", JOptionPane.WARNING_MESSAGE);
                 }
@@ -319,7 +307,7 @@ public class Main {
                 if (selectedBook != null) {
                     lib.removeBook(selectedBook);
                     configInterface();
-                    JOptionPane.showMessageDialog(null, "Removed book successfully!", "Book", JOptionPane.INFORMATION_MESSAGE);
+                    JOptionPane.showMessageDialog(null, "Successfully removed book!", "Book", JOptionPane.INFORMATION_MESSAGE);
                 } else {
                     JOptionPane.showMessageDialog(null, "No book selected!", "Book", JOptionPane.WARNING_MESSAGE);
                 }
@@ -344,7 +332,7 @@ public class Main {
                     }
                     boolean setQuantity = result == JOptionPane.YES_OPTION;
                     String inputQuantity = JOptionPane.showInputDialog("Please enter quantity:");
-                    if (inputQuantity != "") {
+                    if (inputQuantity != null) {
                         try {
                             Integer quantity = Integer.parseInt(inputQuantity);
                             if (setQuantity) {
@@ -353,6 +341,8 @@ public class Main {
                                 lib.changeQuantity(selectedBook, quantity);
                             }
                             configBookTable();
+                        } catch (NumberFormatException ex) {
+                            JOptionPane.showMessageDialog(null, "Error: Number incorrectly formatted!", "Book", JOptionPane.ERROR_MESSAGE);
                         } catch (RuntimeException ex) {
                             JOptionPane.showMessageDialog(null, ex.getMessage(), "Book", JOptionPane.ERROR_MESSAGE);
                         }
@@ -377,10 +367,21 @@ public class Main {
             }
         });
 
+        btnRenewLoanAdmin.addActionListener(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                lib.renewLoan(selectedLoan);
+                lib.loadData();
+                configInterface();
+                JOptionPane.showMessageDialog(null, "Successfully renewed loan!", "Book", JOptionPane.INFORMATION_MESSAGE);
+            }
+        });
+
         btnDelLoan.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (selectedLoan != null) {
+                    lib.renewLoan(selectedLoan);
                     lib.returnBook(selectedLoan);
                     configInterface();
                 } else {
@@ -410,7 +411,7 @@ public class Main {
             @Override
             public void actionPerformed(ActionEvent e) {
                 mainFrame.dispose();
-                lib.showUI();
+                lib.showGUI();
             }
         });
 
@@ -449,10 +450,11 @@ public class Main {
             Member member = lib.searchMember(loan.getMemberID());
             String loanID = Integer.toString(loan.getLoanID());
             String bookTitle = book.getBookTitle();
-            String memberID = Integer.toString(member.getID());
+            String memberName = member.getFullName();
             String borrowDate = loan.getBorrowDate().toString();
-            String returnDate = loan.getBorrowDate().plusDays(30).toString();
-            String[] rowData = {loanID, bookTitle, memberID, borrowDate, returnDate};
+            String returnDate = loan.getReturnDate().toString();
+            String fine = MiscOperations.fineToString(loan.getBorrowDate());
+            String[] rowData = {loanID, bookTitle, memberName, borrowDate, returnDate, fine};
             model.addRow(rowData);
         }
     }
@@ -461,8 +463,7 @@ public class Main {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1) {
             for (Loan loan : loans) {
-                String[] loanData = loan.formatData();
-                if (loanData[0].equals(table.getModel().getValueAt(selectedRow, 0))) {
+                if (Integer.toString(loan.getLoanID()).equals(table.getModel().getValueAt(selectedRow, 0))) {
                     selectedLoan = loan;
                 }
             }
@@ -470,7 +471,7 @@ public class Main {
     }
 
     public void submitCredentials(String foreName, String lastName) {
-        currentUser = lib.searchMember(foreName, lastName);
+        currentUser = lib.searchMemberExact(foreName, lastName);
         if (currentUser != null) {
             mainFrame.setEnabled(true);
             loginFrame.dispose();
@@ -481,7 +482,7 @@ public class Main {
     }
 
     public void registerMember(String foreName, String lastName) {
-        Member loginMember = lib.searchMember(foreName, lastName);
+        Member loginMember = lib.searchMemberExact(foreName, lastName);
         if (loginMember == null) {
             try {
                 lib.addNewMember(foreName, lastName, LocalDate.now());
@@ -495,4 +496,45 @@ public class Main {
         }
     }
 
+    public boolean cancelAddBook(){
+        return !(JOptionPane.showConfirmDialog(null, "Book with title already exists! Continue anyway?") == JOptionPane.YES_OPTION);
+    }
+
+    public boolean paidFine(Loan loan){
+        int result = JOptionPane.showConfirmDialog(null,
+                "You have an outstanding fine of: " + MiscOperations.fineToString(loan.getFine()) + "\nPay now?");
+        switch (result){
+            case JOptionPane.YES_OPTION:
+                try {
+                    int cashOrCard = JOptionPane.showOptionDialog(
+                            null,
+                            "How would you like to pay the fine?",
+                            "Payment method",
+                            JOptionPane.YES_NO_CANCEL_OPTION,
+                            JOptionPane.QUESTION_MESSAGE,
+                            null,
+                            new Object[]{"Cash", "Card", "Cancel"},
+                            null);
+                    if (cashOrCard != JOptionPane.CLOSED_OPTION && cashOrCard != JOptionPane.CANCEL_OPTION) {
+                        lib.payFine(selectedLoan, cashOrCard);
+                        return true;
+                    } else {
+                        return false;
+                    }
+                } catch (RuntimeException ex) {
+                    JOptionPane.showMessageDialog(null, "Error: " + ex.getMessage(), "Loan", JOptionPane.ERROR_MESSAGE);
+                }
+                break;
+            case JOptionPane.NO_OPTION:
+                JOptionPane.showMessageDialog(null, "Cannot continue until the fine is paid!", "Loan", JOptionPane.WARNING_MESSAGE);
+                return false;
+            case JOptionPane.CANCEL_OPTION:
+                return false;
+        }
+        return false;
+    }
+
+    public void showMessage(String message){
+        JOptionPane.showMessageDialog(null, message);
+    }
 }
