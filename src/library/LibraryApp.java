@@ -31,7 +31,7 @@ public class LibraryApp
        
        // STEP2: test the library system
        System.out.println("\n* Start testing ...\n");
-       boolean isFixInput = true;
+       boolean isFixInput = false;
        if (isFixInput){
            // OPTION 1: Test the library system with fixed input.
            // When you start programming, you may pick this test mode.
