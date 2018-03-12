@@ -2,6 +2,8 @@ package library;
 
 import javax.swing.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -275,8 +277,16 @@ public class Library {
                 Book returnBook = searchBook(loan.getBookID());
                 if (returnBook != null) {
                     if (loan.getFine() > 0) {
-                        if (usingGUI) { if (!GUI.paidFine(loan)){ return; } }
-                        else { if (!paidFine(loan)) { return; } }
+                        if (usingGUI) { 
+                            if (!GUI.paidFine(loan)){
+                                return; 
+                            } 
+                        }
+                        else { 
+                            if (!paidFine(loan)) {
+                                return; 
+                            } 
+                        }
                     }
                     loanList.remove(counter);
                     MiscOperations.writeData(loanPath, MiscOperations.listToString(new ArrayList<>(loanList)), false);
@@ -393,7 +403,7 @@ public class Library {
                     System.out.println("\nSucessfully changed quantity!");
                     System.out.println("\nNew quantity: " + book.getQuantityTotal() );
                 } else {
-                    System.out.println("\nBook quantity cannot be reduced to less than zero");
+                    System.out.println("\nBook quantity cannot be reduced to less than zero or to less books than currently available.");
                     if (usingGUI) throw new RuntimeException("Book quantity cannot be reduced to less than zero");
                 }
             }
@@ -662,7 +672,7 @@ public class Library {
     
     public void searchMember() {
         System.out.println("You are now in the member search tool.");
-        System.out.println("Please enter the last name of you wanted member."
+        System.out.println("Please enter the last name of your wanted member."
                 + "\nIf you don't know it then leave it blank and press enter");
         String inputLastName = "";
         try{
@@ -681,11 +691,29 @@ public class Library {
             System.out.println(e.getMessage());
             return;           
         }
+        ArrayList<Member> results = searchMember(inputFirstName, inputLastName);
+        if(results.isEmpty())
+            System.out.println("Your search returned no results");
+        
 
     }
 
     public void returnBook() {
-
+        System.out.println("You are in the book return tool.");
+        System.out.println("Please enter the Loan ID (a six digit number "
+                + "starting with 3).");
+        int loanID = -1;
+        try{
+            loanID = Integer.parseInt(MiscOperations.getInput());
+            returnBook(loanID);
+        }
+        catch(InputException e){
+            System.out.println(e.getMessage());
+            return;
+        }
+        catch(NumberFormatException e){
+            System.out.println("The input could not be converted into a number");
+        }
     }
 
     public void addNewBook() {
@@ -693,11 +721,68 @@ public class Library {
     }
 
     public void addNewMember() {
-
+        System.out.println("You are in the member registration tool.");
+        System.out.println("Please enter the first name of the new member.");
+        try{
+            String firstName = MiscOperations.getInput();
+            System.out.println("Please enter the last name of the new Member");
+            String lastName = MiscOperations.getInput();
+            LocalDate registrationDate = LocalDate.now();
+            System.out.println("Do you want the registration to be put through "
+                    + "today or do you want the account to be activated in the "
+                    + "future? [1]/[2]");
+            String answer = MiscOperations.getInput();
+            if( answer.matches("2") ){
+                System.out.println("Please enter a date on which the activation "
+                        + "should become active in the form dd-mm-yyyy.");
+                DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-mm-yyyy");
+                registrationDate = LocalDate.parse(MiscOperations.getInput(),inputFormat);   
+            }
+            addNewMember(firstName,lastName, registrationDate);
+        }
+        catch (InputException e){
+            System.out.println(e.getMessage());
+            return;
+        }
+        catch (DateTimeParseException e){
+            System.out.println("Your entered date is of an invalid form.");
+        }
+        
     }
 
     public void changeQuantity() {
-
+        System.out.println("You are in the book stock change tool.");
+        boolean bookSelected = false;
+        while(!bookSelected){
+            if(selectedBook != null){
+                System.out.println("Do want to use the previously selected Book?");
+                selectedBook.toString(loanList);
+                System.out.println("[Y]/[N]");
+                try{
+                    String answer = MiscOperations.getInput();
+                    if( answer.matches("y|Y") ){
+                        bookSelected = true;
+                        System.out.println("Please state now how many books you wish"
+                            + " to add or deduct from the stock (as positive or "
+                            + "negative number).");
+                        int delta = Integer.parseInt(MiscOperations.getInput());
+                        changeQuantity(selectedBook, delta);
+                    }
+                }
+                catch(InputException e){
+                    System.out.println(e.getMessage());
+                }
+                catch(NumberFormatException e){
+                    System.out.println("Your input could not be converted into a number.");
+                }
+            }
+            else{
+                System.out.println("You need to select a book, therefore you will "
+                       + "be redirected to the book search tool. You will return "
+                       + "automatically once you successfully selected a book.");
+                searchBook();
+            }
+        }
     }
 
     //endregion

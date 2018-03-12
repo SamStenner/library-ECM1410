@@ -84,16 +84,7 @@ public class Book {
 
     @Override
     public String toString() {
-        String returnString = String.format("Book ID: %d "
-                + "\nTitle: %s "
-                + "\nAuthors: %s "
-                + "\nYear of publication: %d "
-                + "\nTotal quantity: %d\n",
-                getBookID(),
-                getBookTitle(),
-                getBookAuthors(true),
-                getPublishYear(),
-                getQuantityTotal());
+        String returnString = getBookID()+","+getBookTitle()+","+getBookAuthors(false)+","+getPublishYear()+","+getQuantityTotal();
         return returnString;
     }
 
