@@ -120,6 +120,7 @@ public class MiscOperations {
     }
     
     public static String getInput(String message) throws InputException{
+
         if (message != null) {
             System.out.println(message);
         }
@@ -127,6 +128,7 @@ public class MiscOperations {
         String query = "";
         try{
             query = input.nextLine();
+            return query;
         }
         catch (NoSuchElementException ex){
             throw new InputException("An error occured while waiting for input."
@@ -135,9 +137,6 @@ public class MiscOperations {
         catch (Exception ex){
             throw new InputException("An error occured while waiting for input."
                     + "\nYou may be redirected.", null);
-        }
-        finally{
-            return query;
         }
     }
 
