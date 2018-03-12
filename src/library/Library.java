@@ -1,7 +1,11 @@
 package library;
 
+import jdk.jshell.execution.LocalExecutionControl;
+
+import javax.print.attribute.IntegerSyntax;
 import javax.swing.*;
 import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -23,8 +27,6 @@ public class Library {
     private int METHOD_CARD = 1;
 
     private boolean usingGUI = false;
-    
-    private Book selectedBook = null;
 
     public Library(String bookData, String memberData, String bookLoanData) {
         this.bookPath = bookData;
@@ -42,92 +44,71 @@ public class Library {
         }
     }
 
-    public void loadData() {
-        bookshelf.clear();
-        memberList.clear();
-        loanList.clear();
-        bookshelf = MiscOperations.initBooks(bookPath);
-        memberList = MiscOperations.initMembers(memberPath);
-        loanList = MiscOperations.initLoans(loanPath);
-        for (Loan loan: loanList){
-            Book lentBook = null;
-            for (Book book: bookshelf){//find book
-                if(book.getBookID() == loan.getBookID()){
-                    lentBook = book;
-                    break;
-                }
-            }
-            if(lentBook != null){
-                if(null != BookLoanQuant.putIfAbsent(lentBook, 1)){
-                    BookLoanQuant.put(lentBook, BookLoanQuant.get(lentBook)+1);
-                }
-            }
-        }
-
-    }
 
     //region Book Functions
-
-    public ArrayList<Book> searchBook(String query) {
-        ArrayList<Book> matchingBooks = new ArrayList<>();
-        query = query == null ? "" : query.toLowerCase();
-        if (query != null) {
-            for (Book book : bookshelf) {
-                String bookID = Integer.toString(book.getBookID()).toLowerCase();
-                String title = book.getBookTitle().toLowerCase();
-                String author = book.getBookAuthors(true).toLowerCase();
-                if (bookID.contains(query) || title.contains(query) || author.contains(query)) {
-                    matchingBooks.add(book);
-                }
-            }
-        }
-        if (matchingBooks.size() == 0) System.out.println("No matching books!");
-        if (matchingBooks.size() > 1) {
-            System.out.println("\nMultiple matching books:");
-            for (Book book : matchingBooks) {
-                System.out.println("\n" + book.formedString(loanList));
-            }
-        }
-        return matchingBooks;
-/*NOTE: The code that was above here is not necessary because searchBook() prints it already*/
-        return searchBook(query, (bookshelf));
-    }
 
     public Book searchBook(int bookID) {
         for (Book book : bookshelf) {
             if (book.getBookID() == bookID) {
-                System.out.println("\nFound book:");
-                System.out.println(book.formedString(loanList));
+                System.out.println("\nBook Information:\n" + book.formedString(loanList));
                 return book;
             }
         }
         return null;
     }
+
+    public Book searchBook(String query) {
+        query = query == null ? "" : query.toLowerCase();
+        if (query != null) {
+            for (Book book : bookshelf) {
+                if (book.getBookTitle().toLowerCase().equals(query) ||
+                        Integer.toString(book.getBookID()).equals(query)) {
+                    System.out.println("\nBook Information:\n" + book.formedString(loanList));
+                    return book;
+                }
+            }
+        }
+        System.out.println("\nMatching books:");
+        ArrayList<Book> matchingBooks = matchBook(query);
+        if (matchingBooks.size() == 0) {
+            System.out.println("\nNo book with that name exists");
+            if (usingGUI) throw new RuntimeException("Book not found!");
+            return null;
+        }if (matchingBooks.size() == 1){
+            try {
+                System.out.println("\nNo exact match found. Is this the intended book? [Y] | [N]");
+                boolean foundBook = MiscOperations.getInput().toLowerCase().equals("y");
+                if (foundBook) {
+                    return searchBook(matchingBooks.get(0).getBookID());
+                }
+            } catch (Exception ex) {
+                System.out.println("\nInput error!");
+            }
+            return null;
+        } else {
+            try {
+                System.out.println("\nPlease refine your search using the list above!");
+                return searchBook();
+            } catch (Exception ex) {
+                System.out.println("\nInput error!");
+                return null;
+            }
+        }
+    }
     
-    public ArrayList<Book> searchBook(String query, List<Book> library){
+    public ArrayList<Book> matchBook(String query){
         ArrayList<Book> matchingBooks = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
-        for (Book book : library) {
+        for (Book book : bookshelf) {
             String bookID = Integer.toString(book.getBookID()).toLowerCase();
             String title = book.getBookTitle().toLowerCase();
             String author = book.getBookAuthors(true).toLowerCase();
             if (bookID.contains(query) || title.contains(query) || author.contains(query)) {
                 matchingBooks.add(book);
+                System.out.println("\nBook Title: " + book.getBookTitle() + "\nBook ID: " + bookID);
             }
         }    
         return matchingBooks;
-    }
-
-    public Book searchBookExact(String title) {
-        title = title == null ? "" : title.toLowerCase();
-        if (title != null) {
-            for (Book book : bookshelf) {
-                if (book.getBookTitle().toLowerCase().equals(title)) {
-                    return book;
-                }
-            }
-        }
-        return null;
     }
 
     public void borrowBook(String bookTitle, String memberForeName, String memberLastName){
@@ -139,72 +120,30 @@ public class Library {
     }
 
     public void borrowBook(String bookTitle, String memberForeName, String memberLastName, LocalDate borrowDate){
-        ArrayList<Member> listMember = searchMember(memberForeName,  memberLastName);
-        if (listMember.size() == 1) {
-            Member member = listMember.get(0);
-            if (!member.getForeName().equals(memberForeName) || !member.getLastName().equals(memberLastName) && !usingGUI) {
-                System.out.println("\nClosest member match: " + member.getFullName() +". Is this the intended member? [Y] | [N]");
-                try {
-                    boolean intendedMember = MiscOperations.getInput().toLowerCase().equals("y");
-                    if (!intendedMember) {
-                        System.out.println("\nPlease refine your search!");
-                        return;
-                    }
-                } catch (InputException ex) {
-                    System.out.println("\nInput error!");
-                    return;
-                }
+        Member member = searchMember(memberForeName, memberLastName);
+        if (member != null) {
+            Book book = searchBook(bookTitle);
+            if (book != null) {
+                borrowBook(book, member.getID(), borrowDate);
+            }else {
+                System.out.println("No book found!");
             }
-            ArrayList<Book> books = searchBook(bookTitle);
-            if (books.size() == 0) {
-                System.out.println("\nNo book found. Please refine your search!");
-                if (usingGUI) throw new RuntimeException("No book found!");
-            } else if (books.size() > 1) {
-                if (usingGUI) throw new RuntimeException("Multiple books found. Please be more specific!");
-                else {
-                    try {
-                        System.out.println("\nMultiple books found. Please enter the intended book ID from the list above!");
-                        int bookID = Integer.parseInt(MiscOperations.getInput());
-                        borrowBook(bookID, member.getID(), borrowDate);
-                    } catch (InputException ex) {
-                        System.out.println("\nInput error!");
-                        return;
-                    }
-                }
-            } else {
-                System.out.println("\nClosest book match: " + books.get(0).getBookTitle() +". Is this the intended book? [Y] | [N]");
-                try {
-                    boolean intendedBook = MiscOperations.getInput().toLowerCase().equals("y");
-                    if (intendedBook) {
-                        borrowBook(books.get(0).getBookID(), member.getID(), borrowDate);
-                    }
-                } catch (InputException ex) {
-                    System.out.println("\nInput error!");
-                    return;
-                }
-            }
-        } else if (listMember.size() == 0){
-            System.out.println("\nMember not found. Please refine your search!");
-            if (usingGUI) throw new RuntimeException("Member not found!");
-        } else if (listMember.size() > 1) {
-            System.out.println("\nMultiple members found. Please be more specific!");
-            if (usingGUI) throw new RuntimeException("Multiple members found. Please be more specific!");
+        } else {
+            System.out.println("No member found!");
         }
-
     }
 
-    public void borrowBook(int bookID, int memberID, LocalDate borrowDate) {
-        Book book = searchBook(bookID);
+    public void borrowBook(Book book, int memberID, LocalDate borrowDate) {
         if (book != null) {
             int borrowed = MiscOperations.getBooksBorrowed(loanList, memberID);
             if (borrowed < 5) {
                 if (book.getAvailable(loanList) > 0) {
                     int newID = loanList.get(loanList.size() - 1).getLoanID() + 1;
-                    Loan loan = new Loan(newID, bookID, memberID, borrowDate);
+                    Loan loan = new Loan(newID, book.getBookID(), memberID, borrowDate);
                     loanList.add(loan);
                     MiscOperations.writeData(loanPath, loan.toString(), true);
-                    loadData();
                     System.out.println("\nBorrowed book successfully!");
+                    loadData();
                 } else {
                     System.out.println("\nThere are no copies of this book available at this time!");
                     if (usingGUI) throw new RuntimeException("There are no copies of this book available at this time!");
@@ -217,10 +156,6 @@ public class Library {
             System.out.println("\nBook does not currently exist in the library!");
             if (usingGUI) throw new RuntimeException("Book does not currently exist in the library!");
         }
-    }
-
-    public void borrowBook(Book book, Member member){
-        borrowBook(book.getBookID(), member.getID(), LocalDate.now());
     }
 
     public void returnBook(int loanID) {
@@ -268,15 +203,14 @@ public class Library {
             if (usingGUI) throw new RuntimeException("Book quantity must be positive!");
         } else {
             try {
-                boolean existsAlready = searchBookExact(title) != null;
+                boolean existsAlready = searchBook(title) != null;
                 if (existsAlready && usingGUI) {
                     if (GUI.cancelAddBook()) {
-                        System.out.println("Cancelling book addition!" );
                         return;
                     }
                 } else if (existsAlready && !usingGUI) {
                     if (this.cancelAddBook()) {
-                        System.out.println("Cancelling book addition!" );
+                        System.out.println("Cancelled book addition!" );
                         return;
                     }
                 }
@@ -320,23 +254,12 @@ public class Library {
     public void changeQuantity(Book book, int delta) {
         if (book != null) {
             changeQuantity(book.getBookID(), delta);
-        } else {
-            System.out.println("Cannot change quantity: book does not exist!");
-            if (usingGUI) throw new RuntimeException("Cannot change quantity: book does not exist!");
         }
     }
 
     public void changeQuantity(String bookTitle, int delta) {
-        List<Book> books = searchBook(bookTitle);
-        if (books.size() > 1) {
-            System.out.println("Multiple books found. Please be more specific!");
-            if (usingGUI) throw new RuntimeException("Multiple books found. Please be more specific!");
-        } else if (books.size() == 0) {
-            System.out.println("No book found. Please refine your search!");
-            if (usingGUI) throw new RuntimeException("No book found. Please refine your search!");
-        } else {
-            changeQuantity(books.get(0), delta);
-        }
+        Book book = searchBook(bookTitle);
+        changeQuantity(book, delta);
     }
 
     public void changeQuantity(int bookID, int delta) {
@@ -365,39 +288,85 @@ public class Library {
         }
     }
 
-    public int getAvailableCopies(Book query){
-        return (BookLoanQuant.get(query) == null)? query.getQuantityTotal() : query.getAvailable(loanList);
-    }
-
     public List<Book> getBookshelf(){
         return bookshelf;
     }
-
-
 
     //endregion
 
     //region Member Functions
 
-
-    public Member searchMemberExact(String foreName, String lastName){
+    public Member searchMember(int userID) {
         for (Member member : memberList) {
-            if (member.getForeName().equals(foreName) && member.getLastName().equals(lastName)){
+            if (member.getID() == userID){
+                System.out.println("\nFound member:");
+                System.out.println(member.formedString());
+                showMemberLoans(userID);
                 return member;
             }
         }
         return null;
     }
 
-    public ArrayList<Member> searchMember(String foreName, String lastName) {
-        System.out.println("\nMatching members:");
-        ArrayList<Member> matchingLastNames = searchMember(lastName);
-        ArrayList<Member> matchingNames = new ArrayList<>(searchMember(foreName));
-        matchingNames.addAll(matchingLastNames);
-        return matchingNames;
+    public Member searchMember(String foreName, String lastName) {
+        for (Member member : memberList) {
+            if (member.getForeName().toLowerCase().equals(foreName.toLowerCase())
+                    && member.getLastName().toLowerCase().equals(lastName.toLowerCase())){
+                System.out.println("\nFound member:");
+                System.out.println(member.formedString());
+                showMemberLoans(member.getID());
+                return member;
+            }
+        }
+        ArrayList<Member> listMembers = matchMember(foreName,  lastName);
+        if (listMembers.size() == 0) {
+            System.out.println("\nMember not found. Please refine your search!");
+            if (usingGUI) throw new RuntimeException("Member not found!");
+            return null;
+        } else if (listMembers.size() == 1){
+            try {
+                System.out.println("\nNo exact match found. Is this the intended member? [Y] | [N]");
+                boolean foundBook = MiscOperations.getInput().toLowerCase().equals("y");
+                if (foundBook) {
+                    return listMembers.get(0);
+                }
+            } catch (Exception ex) {
+                System.out.println("\nInput error!");
+            }
+            return null;
+        } else {
+            try {
+                System.out.println("\nPlease refine your search using the list above!");
+                return searchMember();
+            } catch (Exception ex) {
+                System.out.println("\nInput error!");
+                return null;
+            }
+        }
     }
 
-    public ArrayList<Member> searchMember(String query) {
+    public ArrayList<Member> matchMember(String foreName, String lastName) {
+        System.out.println("\nPartial Matches");
+        ArrayList<Member> matchingFirstNames = matchMember(foreName);
+        ArrayList<Member> matchingLastNames = matchMember(lastName);
+        for (Member currentMember : matchingLastNames) {
+            boolean exists = false;
+            for (Member otherMember : matchingFirstNames) {
+                if (currentMember.getID() == otherMember.getID()) {
+                    exists = true;
+                }
+            }
+            if (!exists){
+                matchingFirstNames.add(currentMember);
+            }
+        }
+        for (Member member : matchingFirstNames) {
+            System.out.println("\nMember Name: " + member.getFullName() + "\nMember ID: " + member.getID());
+        }
+        return matchingFirstNames;
+    }
+
+    public ArrayList<Member> matchMember(String query) {
         ArrayList<Member> members = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
         for (Member member : memberList) {
@@ -405,22 +374,9 @@ public class Library {
             String memberID = Integer.toString(member.getID()).toLowerCase();
             if (fullName.contains(query) || memberID.contains(query)) {
                 members.add(member);
-                System.out.println("\n" + member.formedString());
             }
         }
         return members;
-    }
-
-    public Member searchMember(int userID) {
-        for (Member member : memberList) {
-            if (member.getID() == userID){
-                System.out.println("\nFound member:");
-                System.out.println(member.formedString());
-                outputMemberLoans(userID);
-                return member;
-            }
-        }
-        return null;
     }
 
     public void addNewMember(String foreName, String lastName,  LocalDate regDate) {
@@ -458,7 +414,7 @@ public class Library {
         return memberLoans;
     }
 
-    public void outputMemberLoans(int memberID){
+    public void showMemberLoans(int memberID){
         System.out.println("\nMember's Loans:");
         boolean hasLoans = false;
         for (Loan loan :loanList) {
@@ -578,166 +534,122 @@ public class Library {
         saveChanges(bookPath, memberPath, loanPath);
     }
 
+    public void loadData() {
+        bookshelf.clear();
+        memberList.clear();
+        loanList.clear();
+        bookshelf = MiscOperations.initBooks(bookPath);
+        memberList = MiscOperations.initMembers(memberPath);
+        loanList = MiscOperations.initLoans(loanPath);
+        for (Loan loan: loanList){
+            Book lentBook = null;
+            for (Book book: bookshelf){//find book
+                if(book.getBookID() == loan.getBookID()){
+                    lentBook = book;
+                    break;
+                }
+            }
+            if(lentBook != null){
+                if(null != BookLoanQuant.putIfAbsent(lentBook, 1)){
+                    BookLoanQuant.put(lentBook, BookLoanQuant.get(lentBook)+1);
+                }
+            }
+        }
+
+    }
+
     //endregion
 
-    //region KeyboardInputOverloads
-
-    public void searchBook() {
-        System.out.println("You are now in the book search tool, please enter a"
-                + " book ID, a title or an author.");
-        String query = " ";
-        try {
-            query = MiscOperations.getInput();
-        } catch (InputException e) {
-            System.out.println("An error occured while waiting for input. "
-                    + "You will be redirected to the main menu, "
-                    + "then please try again.");
-            return;
-        }
-        ArrayList<Book> results = searchBook(query);
-        if (results.size() > 1) {
-            Book result = results.remove(0);
-            System.out.println("Your search result is:");
-            System.out.println(result.toString());
-            System.out.println("Copies available: " + result.getAvailable(loanList));
-            if (results.size() < 1) {
-                System.out.println("No books matched your search.");
-            }
-        }
-        if (results.size() == 1) {
-            Book result = results.remove(0);
-            System.out.println("Your search result is:");
-            System.out.println(result.toString());
-            System.out.println("Copies available: " + getAvailableCopies(result));
-            System.out.println("\nDo you want to select that book?[Y/N]");
-            String input = "";
-            try {
-                input = MiscOperations.getInput();
-            } catch (InputException e) {
-                System.out.println("An error occured while waiting for input. "
-                        + "You will be redirected to the main menu, "
-                        + "then please try again.");
-                return;
-            }
-            if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
-                this.selectedBook = result;
-                System.out.println("The book was selected.");
-            } else {
-                System.out.println("The book was not selected. You will return "
-                        + "to the main menu.");
-            }
-        } else if (results.size() > 1) {
-            System.out.println("Your search results are:");
-            for (Book book : results) {
-                System.out.println(book.toString());
-            }
-            System.out.println("Do you want to refine your search? [Y/N]");
-            try {
-                String input = MiscOperations.getInput();
-                if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
-                    refineSearchBook(results);
-                } else {
-                    System.out.println("No further search initiated, "
-                            + "you will be redirected to the main menu.");
-                }
-            } catch (InputException e) {
-                System.out.println("An error occured with your input.");
-                return;
-            }
-        } else {
-            System.out.println("There were no books found matching your query.");
-            System.out.println("You will be redirected to the main menu.");
-        }
-
-    }
-
-    public void refineSearchBook(ArrayList<Book> formerResults){
-        System.out.println("Please give an additional search statement.");
-        String refineInput = "";
-        try{
-            refineInput = MiscOperations.getInput();
-        }
-        catch (InputException e){
-            System.out.println("An error occured with your input.");
-            return;
-        }
-        ArrayList<Book> results = searchBook(refineInput, formerResults);
-        if (results.size() < 1) {
-            System.out.println("No books matched your search.");
-        }
-        if (results.size() == 1) {
-            Book result = results.remove(0);
-            System.out.println("Your search result is:");
-            System.out.println(result.toString());
-            System.out.println("Copies available: " + getAvailableCopies(result));
-                        System.out.println("\nDo you want to select that book?[Y/N]");
-            String input = "";
-            try{
-                input = MiscOperations.getInput();
-            }
-            catch (InputException e){
-                System.out.println("An error occured while waiting for input. "
-                    + "You will be redirected to the main menu, "
-                    + "then please try again.");
-                return;
-            }
-            if(input.charAt(0) == 'Y' || input.charAt(0) == 'y'){
-                this.selectedBook = result;
-                System.out.println("The book was selected.");
-            }
-            else{
-                System.out.println("The book was not selected. You will return "
-                        + "to the main menu.");
-            }
-        }
-        else if (results.size() > 1){
-            System.out.println("Your search results are:");
-            for(Book book:results){
-                System.out.println(book.toString());
-            }
-            System.out.println("Do you want to refine your search? [Y/N]");
-            try{
-                String input = MiscOperations.getInput();
-                if(input.charAt(0) == 'Y' || input.charAt(0) == 'y'){
-                    refineSearchBook(results);
-                }
-                else{
-                    System.out.println("No further search initiated, "
-                            + "you will be redirected to the main menu.");
-                }
-            }
-            catch (InputException e){
-                System.out.println("An error occured with your input.");
-                return;
-            }
-        } else{
-            System.out.println("There were no books found matching your query.");
-            System.out.println("You will be redirected to the main menu.");
-        }
-    }
+    //region Keyboard Input Overloads
 
     public void borrowBook() {
+        try {
+            String bookTitle = MiscOperations.getInput("\nBook Title/ID:");
+            String memberFirstName = MiscOperations.getInput("Member First Name:");
+            String memberLastName = MiscOperations.getInput("Member Last Name:");
+            borrowBook(bookTitle, memberFirstName, memberLastName);
+        } catch (InputException ex){
+         System.out.println("Error");
+        }
+    }
 
+    public Book searchBook() {
+        try {
+            String query = MiscOperations.getInput("Book Title/ID:");
+            return searchBook(query);
+        } catch (Exception ex) {
+            System.out.println("Error");
+            return null;
+        }
     }
     
-    public void searchMember() {
-
+    public Member searchMember() {
+        try {
+            String memberFirstName = MiscOperations.getInput("\nFirst Name:");
+            String memberLastName = MiscOperations.getInput("Last Name:");
+            return searchMember(memberFirstName, memberLastName);
+        } catch (InputException ex){
+            System.out.println("Error");
+            return null;
+        }
     }
 
     public void returnBook() {
-
+        try {
+            String loanID = MiscOperations.getInput("\nLoan ID:");
+            returnBook(Integer.parseInt(loanID));
+        } catch (InputException ex){
+            System.out.println("Error");
+        }
     }
 
     public void addNewBook() {
-
+        try {
+            String bookTitle = MiscOperations.getInput("\nBooks Title:");
+            String rawAuthors = MiscOperations.getInput("Please enter author names [comma separated]");
+            String[] allAuthors = rawAuthors.split(",");
+            for (int i = 0; i < allAuthors.length; i++) {
+                allAuthors[i] = allAuthors[i].trim();
+            }
+            int year = Integer.parseInt(MiscOperations.getInput("Publication Year:"));
+            int quantity = Integer.parseInt(MiscOperations.getInput("Quantity:"));
+            addNewBook(bookTitle, allAuthors, year, quantity);
+        } catch (InputException ex){
+            System.out.println("Error");
+        }
     }
 
     public void addNewMember() {
-
+        try {
+            String firstName = MiscOperations.getInput("\nFirst Name:");
+            String lastName = MiscOperations.getInput("Last Name:");
+            String regDate = MiscOperations.getInput("Registration Date [yyyy-mm-dd] [Leave blank for today]");
+            LocalDate date = LocalDate.now();
+            if (regDate != "") {
+                DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd");
+                date = LocalDate.parse(regDate, formatter);
+            }
+            addNewMember(firstName, lastName, date);
+        } catch (Exception ex) {
+            System.out.println("Error");
+        }
     }
 
     public void changeQuantity() {
+        try {
+            String query = MiscOperations.getInput("\nBook Title/ID:");
+            Book book = searchBook(query);
+            boolean resetQuantity = MiscOperations.getInput("\bSet quantity or increase/decrease quantity? [S] | [I]").toLowerCase().equals("s");
+            int quantity = Integer.parseInt(MiscOperations.getInput("\nQuantity:"));
+            if (resetQuantity) {
+                setQuantity(book, quantity);
+            } else {
+                changeQuantity(book, quantity);
+            }
 
+        } catch (Exception ex) {
+            System.out.println("Error taking input. Please try again!");
+        }
     }
 
     //endregion
@@ -752,6 +664,5 @@ public class Library {
         GUI = new Main(this);
         GUI.showLogin();
     }
-
 
 }

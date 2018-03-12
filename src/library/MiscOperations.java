@@ -119,7 +119,10 @@ public class MiscOperations {
         }
     }
     
-    public static String getInput() throws InputException{
+    public static String getInput(String message) throws InputException{
+        if (message != null) {
+            System.out.println(message);
+        }
         Scanner input = new Scanner(System.in);
         String query = "";
         try{
@@ -134,6 +137,10 @@ public class MiscOperations {
         finally{
             return query;
         }
+    }
+
+    public static String getInput() throws InputException{
+        return getInput(null);
     }
 
     public static double calculateFine(LocalDate borrowDate){

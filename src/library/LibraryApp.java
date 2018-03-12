@@ -70,24 +70,23 @@ public class LibraryApp
                     lib.searchBook("Java");
                     break;
                case 'i': case 'I'://search for member information
-                    lib.searchMember("Sarah","Hoopern");
+                    lib.searchMember("Sarah","Hooepern");
                     break;
                case 'b': case 'B'://borrow one book
-                    lib.borrowBook("Data S","Jordan","Coaoper");
+                    lib.borrowBook("java","Jordan","smaith");
                     break;
                case 'r': case 'R'://return one book via the book loan Id
-                    lib.returnBook(300001);
+                    lib.returnBook(300016);
                     break;
                case 'a': case 'A'://add a new book
                     String [] authorNames = new String [] {"Jaideva Goswami"};
-                    lib.addNewBook("Fundamentals of Wavelets",authorNames,
-                    2010,4);
+                    lib.addNewBook("Fundamentals of Wavelets", authorNames, 2010,4);
                     break;
                case 'n': case 'N'://add a new member
                     lib.addNewMember("Hongping","Cai", LocalDate.now());
                     break;
                case 'c': case 'C'://change the stock for a book
-                    lib.changeQuantity("Data Mining",-2);
+                    lib.changeQuantity("Data S",-2);
                     break;
                case 'q': case 'Q'://quit
                    return;
