@@ -6,6 +6,10 @@ import javax.print.attribute.IntegerSyntax;
 import javax.swing.*;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
+<<<<<<< HEAD
+=======
+import java.time.format.DateTimeParseException;
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -27,6 +31,12 @@ public class Library {
     private int METHOD_CARD = 1;
 
     private boolean usingGUI = false;
+<<<<<<< HEAD
+=======
+    
+    private Book selectedBook = null;
+    private Member selectedMember = null;
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
 
     public Library(String bookData, String memberData, String bookLoanData) {
         this.bookPath = bookData;
@@ -57,6 +67,7 @@ public class Library {
         return null;
     }
 
+<<<<<<< HEAD
     public Book searchBook(String query) {
         query = query == null ? "" : query.toLowerCase();
         if (query != null) {
@@ -92,14 +103,50 @@ public class Library {
             } catch (Exception ex) {
                 System.out.println("\nInput error!");
                 return null;
+=======
+    //region Book Functions
+    /**
+     * 
+     * @param query
+     * @return 
+     */
+    public ArrayList<Book> searchBook(String query) {
+        return searchBook(query, (bookshelf));
+    }
+    /**
+     * 
+     * @param bookID
+     * @return 
+     */
+    public Book searchBook(int bookID) {
+        for (Book book : bookshelf) {
+            if (book.getBookID() == bookID) {
+                System.out.println("\nFound book:");
+                System.out.println(book.toString(loanList));
+                return book;
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
             }
         }
     }
+<<<<<<< HEAD
     
     public ArrayList<Book> matchBook(String query){
         ArrayList<Book> matchingBooks = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
         for (Book book : bookshelf) {
+=======
+    /**
+     * 
+     * @param query
+     * @param library
+     * @return 
+     */
+    public ArrayList<Book> searchBook(String query, List<Book> library){
+        ArrayList<Book> matchingBooks = new ArrayList<>();
+        query = query == null ? "" : query.toLowerCase();
+        //search
+        for (Book book : library) {
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
             String bookID = Integer.toString(book.getBookID()).toLowerCase();
             String title = book.getBookTitle().toLowerCase();
             String author = book.getBookAuthors(true).toLowerCase();
@@ -107,10 +154,77 @@ public class Library {
                 matchingBooks.add(book);
                 System.out.println("\nBook Title: " + book.getBookTitle() + "\nBook ID: " + bookID);
             }
-        }    
+        }   
+        //output
+        if (matchingBooks.size() == 1) {
+            Book result = matchingBooks.remove(0);                              // if only one matching book was found
+            System.out.println("Your search result is:");
+            System.out.println(result.toString(this.getLoanList()));
+            System.out.println("\nDo you want to select that book?[Y/N]");
+            String input = "";
+            try {
+                input = MiscOperations.getInput();
+            } catch (InputException e) {
+                System.out.println(e.getMessage());
+                return matchingBooks;
+            }
+            if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
+                this.selectedBook = result;
+                System.out.println("The book was selected.");
+            } else {
+                System.out.println("The book was not selected. You will return "
+                        + "to the main menu.");
+            }
+        } else if (matchingBooks.size() > 1) {                                  //multiple matches
+            System.out.println("Your search results are:");
+            for (Book book : matchingBooks) {
+                System.out.println(book.toString());
+            }
+            System.out.println("Do you want to refine your search? [Y/N]");
+            try {
+                String input = MiscOperations.getInput();
+                if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
+                    refineSearchBook(matchingBooks);
+                } else {
+                    System.out.println("No further search initiated, "
+                            + "you will be redirected to the main menu.");
+                }
+            } catch (InputException e) {
+                System.out.println("An error occured with your input.");
+                return matchingBooks;
+            }
+        } else {                                                                //no matches
+            System.out.println("There were no books found matching your query.");
+            System.out.println("You will be redirected to the main menu.");
+        }
         return matchingBooks;
     }
+<<<<<<< HEAD
 
+=======
+    /**
+     * 
+     * @param title
+     * @return 
+     */
+    public Book searchBookExact(String title) {
+        title = title == null ? "" : title.toLowerCase();
+        if (title != null) {
+            for (Book book : bookshelf) {
+                if (book.getBookTitle().toLowerCase().equals(title)) {
+                    return book;
+                }
+            }
+        }
+        return null;
+    }
+    /**
+     * 
+     * @param bookTitle
+     * @param memberForeName
+     * @param memberLastName 
+     */
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
     public void borrowBook(String bookTitle, String memberForeName, String memberLastName){
         try {
             borrowBook(bookTitle, memberForeName, memberLastName, LocalDate.now());
@@ -165,8 +279,16 @@ public class Library {
                 Book returnBook = searchBook(loan.getBookID());
                 if (returnBook != null) {
                     if (loan.getFine() > 0) {
-                        if (usingGUI) { if (!GUI.paidFine(loan)){ return; } }
-                        else { if (!paidFine(loan)) { return; } }
+                        if (usingGUI) { 
+                            if (!GUI.paidFine(loan)){
+                                return; 
+                            } 
+                        }
+                        else { 
+                            if (!paidFine(loan)) {
+                                return; 
+                            } 
+                        }
                     }
                     loanList.remove(counter);
                     MiscOperations.writeData(loanPath, MiscOperations.listToString(new ArrayList<>(loanList)), false);
@@ -218,7 +340,7 @@ public class Library {
                 Book newBook = new Book(newID, title, authorNames, publishYear, quantity);
                 String entry = newBook.toString();
                 System.out.println("\nSuccessfully added new book:");
-                System.out.println(newBook.formedString(loanList));
+                System.out.println(newBook.toString(loanList));
                 MiscOperations.writeData(bookPath, entry, true);
                 loadData();
             } catch (Exception ex) {
@@ -271,7 +393,7 @@ public class Library {
                     System.out.println("\nSucessfully changed quantity!");
                     System.out.println("\nNew quantity: " + book.getQuantityTotal() );
                 } else {
-                    System.out.println("\nBook quantity cannot be reduced to less than zero");
+                    System.out.println("\nBook quantity cannot be reduced to less than zero or to less books than currently available.");
                     if (usingGUI) throw new RuntimeException("Book quantity cannot be reduced to less than zero");
                 }
             }
@@ -345,6 +467,7 @@ public class Library {
         }
     }
 
+<<<<<<< HEAD
     public ArrayList<Member> matchMember(String foreName, String lastName) {
         System.out.println("\nPartial Matches");
         ArrayList<Member> matchingFirstNames = matchMember(foreName);
@@ -379,6 +502,25 @@ public class Library {
         return members;
     }
 
+=======
+    public ArrayList<Member> searchMember(String query) {
+        return searchMember(query, (ArrayList)memberList);
+    }
+
+    public Member searchMember(int userID) {
+        System.out.println("Searching using Member ID.");
+        for (Member member : memberList) {
+            if (member.getID() == userID){
+                System.out.println("\nFound member:");
+                System.out.println(member.formedString());
+                outputMemberLoans(userID);
+                return member;
+            }
+        }
+        return null;
+    }
+
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
     public void addNewMember(String foreName, String lastName,  LocalDate regDate) {
         try {
             if (foreName.length() == 0 || lastName.length() == 0) {
@@ -534,6 +676,7 @@ public class Library {
         saveChanges(bookPath, memberPath, loanPath);
     }
 
+<<<<<<< HEAD
     public void loadData() {
         bookshelf.clear();
         memberList.clear();
@@ -600,10 +743,140 @@ public class Library {
             returnBook(Integer.parseInt(loanID));
         } catch (InputException ex){
             System.out.println("Error");
+=======
+    //endregion
+
+    //region KeyboardInputOverloads
+
+    public void searchBook() {
+        System.out.println("You are now in the book search tool, please enter a"
+                + " book ID, a title or an author.");
+        String query = " ";
+        try {
+            query = MiscOperations.getInput();
+        } catch (InputException e) {
+                System.out.println(e.getMessage());
+            return;
+        }
+        searchBook(query);
+    }
+
+    public void refineSearchBook(ArrayList<Book> formerResults){
+        System.out.println("Please give an additional search statement.");
+        String refineInput = "";
+        try{
+            refineInput = MiscOperations.getInput();
+        }
+        catch (InputException e){
+            System.out.println("An error occured with your input.");
+            return;
+        }
+        searchBook(refineInput, formerResults);
+    }
+
+    public void borrowBook() {
+        System.out.println("You are now in the book borrow tool.");
+        System.out.println("To borrow a book, you need to select a book and a "
+                + "member who borrows the book.");
+        boolean bookSelected = false;
+        boolean memberSelected = false;
+        while(!bookSelected){
+            if(selectedBook != null){
+                System.out.println("Do want to use the previously selected Book?");
+                selectedBook.toString(loanList);
+                System.out.println("[Y]/[N]");
+                try{
+                    String answer = MiscOperations.getInput();
+                    if( answer.matches("y|Y") ){
+                        bookSelected = true;
+                    }
+                }
+                catch(InputException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+            else{
+                System.out.println("You need to select a book, therefore you will "
+                       + "be redirected to the book search tool. You will return "
+                       + "automatically once you successfully selected a book.");
+                searchBook();
+            }
+        }
+        while(!memberSelected){
+            if(selectedMember != null){
+                System.out.println("Do want to use the previously selected Member?");
+                selectedMember.formedString();
+                System.out.println("[Y]/[N]");
+                try{
+                    String answer = MiscOperations.getInput();
+                    if( answer.matches("y|Y") ){
+                        memberSelected = true;
+                    }
+                }
+                catch(InputException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+            else{
+                System.out.println("You need to select a member, therefore you will "
+                       + "be redirected to the member search tool. You will return "
+                       + "automatically once you successfully selected a book.");
+                searchMember();
+            }
+        }
+        borrowBook(selectedBook,selectedMember);
+                
+    }
+    
+    public void searchMember() {
+        System.out.println("You are now in the member search tool.");
+        System.out.println("Please enter the last name of your wanted member."
+                + "\nIf you don't know it then leave it blank and press enter");
+        String inputLastName = "";
+        try{
+            inputLastName = MiscOperations.getInput();
+        }
+        catch (InputException e){
+            System.out.println(e.getMessage());
+            return;
+        }
+        System.out.println("Please enter now the first name of your wanted member.");
+        String inputFirstName = "";
+        try{
+            inputFirstName = MiscOperations.getInput();
+        }
+        catch (InputException e){
+            System.out.println(e.getMessage());
+            return;           
+        }
+        ArrayList<Member> results = searchMember(inputFirstName, inputLastName);
+        if(results.isEmpty())
+            System.out.println("Your search returned no results");
+        
+
+    }
+
+    public void returnBook() {
+        System.out.println("You are in the book return tool.");
+        System.out.println("Please enter the Loan ID (a six digit number "
+                + "starting with 3).");
+        int loanID = -1;
+        try{
+            loanID = Integer.parseInt(MiscOperations.getInput());
+            returnBook(loanID);
+        }
+        catch(InputException e){
+            System.out.println(e.getMessage());
+            return;
+        }
+        catch(NumberFormatException e){
+            System.out.println("The input could not be converted into a number");
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
         }
     }
 
     public void addNewBook() {
+<<<<<<< HEAD
         try {
             String bookTitle = MiscOperations.getInput("\nBooks Title:");
             String rawAuthors = MiscOperations.getInput("Please enter author names [comma separated]");
@@ -649,6 +922,73 @@ public class Library {
 
         } catch (Exception ex) {
             System.out.println("Error taking input. Please try again!");
+=======
+        
+    }
+
+    public void addNewMember() {
+        System.out.println("You are in the member registration tool.");
+        System.out.println("Please enter the first name of the new member.");
+        try{
+            String firstName = MiscOperations.getInput();
+            System.out.println("Please enter the last name of the new Member");
+            String lastName = MiscOperations.getInput();
+            LocalDate registrationDate = LocalDate.now();
+            System.out.println("Do you want the registration to be put through "
+                    + "today or do you want the account to be activated in the "
+                    + "future? [1]/[2]");
+            String answer = MiscOperations.getInput();
+            if( answer.matches("2") ){
+                System.out.println("Please enter a date on which the activation "
+                        + "should become active in the form dd-mm-yyyy.");
+                DateTimeFormatter inputFormat = DateTimeFormatter.ofPattern("dd-mm-yyyy");
+                registrationDate = LocalDate.parse(MiscOperations.getInput(),inputFormat);   
+            }
+            addNewMember(firstName,lastName, registrationDate);
+        }
+        catch (InputException e){
+            System.out.println(e.getMessage());
+            return;
+        }
+        catch (DateTimeParseException e){
+            System.out.println("Your entered date is of an invalid form.");
+        }
+        
+    }
+
+    public void changeQuantity() {
+        System.out.println("You are in the book stock change tool.");
+        boolean bookSelected = false;
+        while(!bookSelected){
+            if(selectedBook != null){
+                System.out.println("Do want to use the previously selected Book?");
+                selectedBook.toString(loanList);
+                System.out.println("[Y]/[N]");
+                try{
+                    String answer = MiscOperations.getInput();
+                    if( answer.matches("y|Y") ){
+                        bookSelected = true;
+                        System.out.println("Please state now how many books you wish"
+                            + " to add or deduct from the stock (as positive or "
+                            + "negative number).");
+                        int delta = Integer.parseInt(MiscOperations.getInput());
+                        changeQuantity(selectedBook, delta);
+                    }
+                }
+                catch(InputException e){
+                    System.out.println(e.getMessage());
+                }
+                catch(NumberFormatException e){
+                    System.out.println("Your input could not be converted into a number.");
+                }
+            }
+            else{
+                System.out.println("You need to select a book, therefore you will "
+                       + "be redirected to the book search tool. You will return "
+                       + "automatically once you successfully selected a book.");
+                searchBook();
+            }
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
         }
     }
 
@@ -665,4 +1005,74 @@ public class Library {
         GUI.showLogin();
     }
 
+<<<<<<< HEAD
+=======
+    public void refineSearchMember(ArrayList<Member> formerResults) {
+        System.out.println("Please give an additional search statement.");
+        String refineInput = "";
+        try{
+            refineInput = MiscOperations.getInput();
+        }
+        catch (InputException e){
+            System.out.println("An error occured with your input.");
+            return;
+        }
+        searchMember(refineInput, formerResults);
+    }
+
+    public ArrayList<Member> searchMember(String query, ArrayList<Member> memberCollection) {
+        ArrayList<Member> members = new ArrayList<>();
+        query = query == null ? "" : query.toLowerCase();
+        for (Member member : memberCollection) {
+            String fullName = member.getFullName().toLowerCase();
+            String memberID = Integer.toString(member.getID()).toLowerCase();
+            if (fullName.contains(query) || memberID.contains(query)) {
+                members.add(member);
+            }
+        }
+        if(members.size()==1){
+            System.out.println("One matching member was found:");
+            System.out.println(members.get(0).formedString());
+            System.out.println("\nDo you want to select that Member?[Y/N]");
+            try {
+                String input = MiscOperations.getInput();
+                if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
+                this.selectedMember = members.get(0);
+                System.out.println("The member was selected.");
+                } 
+                else {
+                System.out.println("The member was not selected. You will return "
+                        + "to the main menu.");
+                }
+            } catch (InputException e) {
+                System.out.println(e.getMessage());
+                return members;
+            }
+        }
+        else if(members.size()>1){
+            System.out.println("Your search results are:");
+            for (Member member : members) {
+                System.out.println(member.formedString());
+            }
+            System.out.println("Do you want to refine your search? [Y/N]");
+            try {
+                String input = MiscOperations.getInput();
+                if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
+                    refineSearchMember(members);
+                } else {
+                    System.out.println("No further search initiated, "
+                            + "you will be redirected to the main menu.");
+                }
+            } catch (InputException e) {
+                System.out.println("An error occured with your input.");
+            }
+        }
+        else{
+            System.out.println("No members matching your query could be found.");
+        }
+        return members;
+    }
+
+
+>>>>>>> 5e8d1ccf877b341033261fe4cd114c66fec4d63f
 }

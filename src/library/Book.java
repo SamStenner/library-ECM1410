@@ -19,32 +19,32 @@ public class Book {
         this.bookTitle = bookTitle;
         this.bookAuthors = bookAuthors;
         this.publishYear = publishYear;
-        this.quantityTotal= quantity;
+        this.quantityTotal = quantity;
     }
 
-    public String[] formatData(List<Loan> loanList){
+    public String[] formatData(List<Loan> loanList) {
         String[] data = {Integer.toString(bookID),
-                         bookTitle,
-                         getBookAuthors(true),
-                         Integer.toString(publishYear),
-                         Integer.toString(getAvailable(loanList)),
-                         Integer.toString(quantityTotal)};
+            bookTitle,
+            getBookAuthors(true),
+            Integer.toString(publishYear),
+            Integer.toString(getAvailable(loanList)),
+            Integer.toString(quantityTotal)};
         return data;
     }
 
-    public int getBookID(){
+    public int getBookID() {
         return this.bookID;
     }
 
-    public String getBookTitle(){
+    public String getBookTitle() {
         return this.bookTitle;
     }
 
-    public String getBookAuthors(boolean niceFormat){
+    public String getBookAuthors(boolean niceFormat) {
         return String.join(niceFormat ? ", " : ":", this.bookAuthors);
     }
 
-    public int getPublishYear(){
+    public int getPublishYear() {
         return this.publishYear;
     }
 
@@ -52,7 +52,7 @@ public class Book {
         quantityTotal += delta;
     }
 
-    public int getQuantityTotal(){
+    public int getQuantityTotal() {
         return quantityTotal;
     }
 
@@ -66,26 +66,26 @@ public class Book {
         return quantity;
     }
 
-    public String formedString(List<Loan> loanList){
-        String returnString = String.format("Book ID: %d " +
-                        "\nTitle: %s " +
-                        "\nAuthors: %s " +
-                        "\nYear of publication: %d " +
-                        "\nNumber available: %d" +
-                        "\nTotal quantity: %d",
-                        getBookID(),
-                        getBookTitle(),
-                        getBookAuthors(true),
-                        getPublishYear(),
-                        getAvailable(loanList),
-                        getQuantityTotal());
+    public String toString(List<Loan> loanList) {
+        String returnString = String.format("Book ID: %d "
+                + "\nTitle: %s "
+                + "\nAuthors: %s "
+                + "\nYear of publication: %d "
+                + "\nNumber available: %d"
+                + "\nTotal quantity: %d",
+                getBookID(),
+                getBookTitle(),
+                getBookAuthors(true),
+                getPublishYear(),
+                getAvailable(loanList),
+                getQuantityTotal());
         return returnString;
     }
 
     @Override
-    public String toString(){
-        String entry = bookID + "," + bookTitle + "," + getBookAuthors(false) + "," + publishYear + "," + quantityTotal;
-        return entry;
+    public String toString() {
+        String returnString = getBookID()+","+getBookTitle()+","+getBookAuthors(false)+","+getPublishYear()+","+getQuantityTotal();
+        return returnString;
     }
 
 }

@@ -129,10 +129,12 @@ public class MiscOperations {
             query = input.nextLine();
         }
         catch (NoSuchElementException ex){
-            throw new InputException("An error occured while waiting for input.", new NoSuchElementException());
+            throw new InputException("An error occured while waiting for input."
+                    + "\nYou may be redirected.", new NoSuchElementException());
         }
         catch (Exception ex){
-            throw new InputException("An error occured while waiting for input.", null);
+            throw new InputException("An error occured while waiting for input."
+                    + "\nYou may be redirected.", null);
         }
         finally{
             return query;
