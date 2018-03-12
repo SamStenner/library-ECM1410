@@ -27,7 +27,7 @@ public class Library {
     private boolean usingGUI = false;
     
     private Book selectedBook = null;
-    private Member selctedMember = null;
+    private Member selectedMember = null;
 
     public Library(String bookData, String memberData, String bookLoanData) {
         this.bookPath = bookData;
@@ -453,17 +453,7 @@ public class Library {
     }
 
     public ArrayList<Member> searchMember(String query) {
-        ArrayList<Member> members = new ArrayList<>();
-        query = query == null ? "" : query.toLowerCase();
-        for (Member member : memberList) {
-            String fullName = member.getFullName().toLowerCase();
-            String memberID = Integer.toString(member.getID()).toLowerCase();
-            if (fullName.contains(query) || memberID.contains(query)) {
-                members.add(member);
-                System.out.println("\n" + member.formedString());
-            }
-        }
-        return members;
+        return searchMember(query, (ArrayList)memberList);
     }
 
     public Member searchMember(int userID) {
@@ -666,7 +656,55 @@ public class Library {
 
     public void borrowBook() {
         System.out.println("You are now in the book borrow tool.");
-        System.out.println("");
+        System.out.println("To borrow a book, you need to select a book and a "
+                + "member who borrows the book.");
+        boolean bookSelected = false;
+        boolean memberSelected = false;
+        while(!bookSelected){
+            if(selectedBook != null){
+                System.out.println("Do want to use the previously selected Book?");
+                selectedBook.toString(loanList);
+                System.out.println("[Y]/[N]");
+                try{
+                    String answer = MiscOperations.getInput();
+                    if( answer.matches("y|Y") ){
+                        bookSelected = true;
+                    }
+                }
+                catch(InputException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+            else{
+                System.out.println("You need to select a book, therefore you will "
+                       + "be redirected to the book search tool. You will return "
+                       + "automatically once you successfully selected a book.");
+                searchBook();
+            }
+        }
+        while(!memberSelected){
+            if(selectedMember != null){
+                System.out.println("Do want to use the previously selected Member?");
+                selectedMember.formedString();
+                System.out.println("[Y]/[N]");
+                try{
+                    String answer = MiscOperations.getInput();
+                    if( answer.matches("y|Y") ){
+                        memberSelected = true;
+                    }
+                }
+                catch(InputException e){
+                    System.out.println(e.getMessage());
+                }
+            }
+            else{
+                System.out.println("You need to select a member, therefore you will "
+                       + "be redirected to the member search tool. You will return "
+                       + "automatically once you successfully selected a book.");
+                searchMember();
+            }
+        }
+        borrowBook(selectedBook,selectedMember);
                 
     }
     
@@ -717,7 +755,7 @@ public class Library {
     }
 
     public void addNewBook() {
-
+        
     }
 
     public void addNewMember() {
@@ -796,6 +834,72 @@ public class Library {
         usingGUI = true;
         GUI = new Main(this);
         GUI.showLogin();
+    }
+
+    public void refineSearchMember(ArrayList<Member> formerResults) {
+        System.out.println("Please give an additional search statement.");
+        String refineInput = "";
+        try{
+            refineInput = MiscOperations.getInput();
+        }
+        catch (InputException e){
+            System.out.println("An error occured with your input.");
+            return;
+        }
+        searchMember(refineInput, formerResults);
+    }
+
+    public ArrayList<Member> searchMember(String query, ArrayList<Member> memberCollection) {
+        ArrayList<Member> members = new ArrayList<>();
+        query = query == null ? "" : query.toLowerCase();
+        for (Member member : memberCollection) {
+            String fullName = member.getFullName().toLowerCase();
+            String memberID = Integer.toString(member.getID()).toLowerCase();
+            if (fullName.contains(query) || memberID.contains(query)) {
+                members.add(member);
+            }
+        }
+        if(members.size()==1){
+            System.out.println("One matching member was found:");
+            System.out.println(members.get(0).formedString());
+            System.out.println("\nDo you want to select that Member?[Y/N]");
+            try {
+                String input = MiscOperations.getInput();
+                if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
+                this.selectedMember = members.get(0);
+                System.out.println("The member was selected.");
+                } 
+                else {
+                System.out.println("The member was not selected. You will return "
+                        + "to the main menu.");
+                }
+            } catch (InputException e) {
+                System.out.println(e.getMessage());
+                return members;
+            }
+        }
+        else if(members.size()>1){
+            System.out.println("Your search results are:");
+            for (Member member : members) {
+                System.out.println(member.formedString());
+            }
+            System.out.println("Do you want to refine your search? [Y/N]");
+            try {
+                String input = MiscOperations.getInput();
+                if (input.charAt(0) == 'Y' || input.charAt(0) == 'y') {
+                    refineSearchMember(members);
+                } else {
+                    System.out.println("No further search initiated, "
+                            + "you will be redirected to the main menu.");
+                }
+            } catch (InputException e) {
+                System.out.println("An error occured with your input.");
+            }
+        }
+        else{
+            System.out.println("No members matching your query could be found.");
+        }
+        return members;
     }
 
 
