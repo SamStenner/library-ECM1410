@@ -755,7 +755,8 @@ public class Library {
     }
 
     public void addNewBook() {
-        
+        System.out.println("You are in the book add tool.");
+        System.out.println("To add a book to the library please hold the following informaiton at hand:\nThe title of the book\nThe name(s) of the author(s)\n")
     }
 
     public void addNewMember() {
