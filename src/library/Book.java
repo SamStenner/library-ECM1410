@@ -3,7 +3,7 @@ package library;
 import java.util.List;
 /**
  * This class represents a book in the library system.
- * @author maxpr
+ * @author Sam Stenner, Max Prüstel
  * @version 1
  */
 public class Book {
