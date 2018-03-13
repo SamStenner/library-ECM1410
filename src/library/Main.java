@@ -71,8 +71,13 @@ public class Main {
     private Loan selectedLoan;
     private Member currentUser;
 
+    // the library being accessed by the GUI
     private Library lib;
 
+    /**
+     * The main constructor for the GUI class
+     * @param lib
+     */
     public Main(Library lib){
         this.lib = lib;
         mainFrame = new JFrame("Library Mangement System");
@@ -83,6 +88,9 @@ public class Main {
         mainFrame.setEnabled(false);
     }
 
+    /**
+     * shows the login menu interface
+     */
     public void showLogin(){
         loginFrame = new JFrame("Login");
         loginFrame.setContentPane(new Login(this).panelLogin);
@@ -92,6 +100,9 @@ public class Main {
         loginFrame.toFront();
     }
 
+    /**
+     * shows the add new book interface
+     */
     public void showAddBook(){
         JFrame addBookFrame = new JFrame("Add Book");
         AddBook addBook = new AddBook(lib, addBookFrame, this);
@@ -102,6 +113,9 @@ public class Main {
         addBookFrame.toFront();
     }
 
+    /**
+     * shows the loan info interface
+     */
     public void showLoanInfo(){
         if (selectedLoan != null) {
             JFrame loanFrame = new JFrame("Loan Info");
@@ -117,6 +131,9 @@ public class Main {
         }
     }
 
+    /**
+     * populates the book table with data from library
+     */
     public void configBookTable(){
         txtSearchMembers.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -156,6 +173,9 @@ public class Main {
         txtSearch.setText(null);
     }
 
+    /**
+     * populates loan table with data from library
+     */
     public void configLoanTable() {
         List<Loan> listLoans = lib.getMemberLoanList(currentUser.getID());
         DefaultTableModel model = (DefaultTableModel) tableLoans.getModel();
@@ -172,6 +192,9 @@ public class Main {
         });
     }
 
+    /**
+     * populates admin loan table with data from library
+     */
     public void configAllLoansTable() {
         List<Loan> listAllLoans = lib.getLoanList();
         DefaultTableModel model = (DefaultTableModel) tableAllLoans.getModel();
@@ -186,6 +209,9 @@ public class Main {
         });
     }
 
+    /**
+     * populates admin member table with data from library
+     */
     public void configAllMembersTable(){
         txtSearch.getDocument().addDocumentListener(new DocumentListener() {
             @Override
@@ -209,6 +235,10 @@ public class Main {
         txtSearchMembers.setText(null);
     }
 
+    /**
+     * show results of book search in book table
+     * @param query
+     */
     private void updateBookTable(String query){
         DefaultTableModel model = (DefaultTableModel) tableBooks.getModel();
         model.setRowCount(0);
@@ -221,6 +251,10 @@ public class Main {
         lblMatches.setText(txtSearch.getText().equals("") ? "" : "Matching Results: " + matches);
     }
 
+    /**
+     * show results of member search in book table
+     * @param query
+     */
     private void updateMembersTable(String query) {
         DefaultTableModel model = (DefaultTableModel) tableAllMembers.getModel();
         model.setRowCount(0);
@@ -230,6 +264,9 @@ public class Main {
         }
     }
 
+    /**
+     * shows the account details interface
+     */
     private void showAccountDetails(){
         lblAccountID.setText(Integer.toString(currentUser.getID()));
         lblForeName.setText(currentUser.getForeName());
@@ -237,6 +274,9 @@ public class Main {
         lblCreatedDate.setText(currentUser.getRegisterDate().toString());
     }
 
+    /**
+     * Creates the listeners for every UI element
+     */
     private void configForm(){
 
         configInterface();
@@ -278,8 +318,7 @@ public class Main {
                     lib.renewLoan(selectedLoan);
                     lib.loadData();
                     configInterface();
-                    JOptionPane.showMessageDialog(null,
-                            "Book successfully renewed!");
+                    showMessage("Book successfully renewed!");
                 } else {
                     JOptionPane.showMessageDialog(null, "No loan selected!", "Loan", JOptionPane.WARNING_MESSAGE);
                 }
@@ -434,6 +473,9 @@ public class Main {
         });
     }
 
+    /**
+     * configures the interface
+     */
     private void configInterface(){
         selectedLoan = null;
         selectedBook = null;
@@ -444,6 +486,11 @@ public class Main {
         showAccountDetails();
     }
 
+    /**
+     * defines the columns for the table
+     * @param model the table's model
+     * @param columnNames array of the column names
+     */
     private void createTableColumns(DefaultTableModel model, String[] columnNames){
         model.setRowCount(0);
         model.setColumnCount(0);
@@ -452,6 +499,11 @@ public class Main {
         }
     }
 
+    /**
+     * adds the rows to the table
+     * @param model the table's model
+     * @param loans the list of loans to be added to the table
+     */
     private void addLoanRows(DefaultTableModel model, List<Loan> loans){
         for (int i = 0; i < loans.size(); i++) {
             Loan loan = loans.get(i);
@@ -468,6 +520,11 @@ public class Main {
         }
     }
 
+    /**
+     * Sets the selected loan to be the clicked loan from the table
+     * @param table the loan table clicked
+     * @param loans the list of loans
+     */
     private void getSelectedLoan(JTable table, List<Loan> loans) {
         int selectedRow = table.getSelectedRow();
         if (selectedRow != -1) {
@@ -479,6 +536,11 @@ public class Main {
         }
     }
 
+    /**
+     * Tries to log in the user
+     * @param foreName user's first name
+     * @param lastName user's last name
+     */
     public void submitCredentials(String foreName, String lastName) {
         currentUser = lib.searchMember(foreName, lastName);
         if (currentUser != null) {
@@ -490,6 +552,11 @@ public class Main {
         }
     }
 
+    /**
+     * registers a new member
+     * @param foreName user's first name
+     * @param lastName user's last name
+     */
     public void registerMember(String foreName, String lastName) {
         Member loginMember = lib.searchMember(foreName, lastName);
         if (loginMember == null) {
@@ -505,10 +572,19 @@ public class Main {
         }
     }
 
+    /**
+     * Shows the option menu to cancel adding a book if it already exists
+     * @return true or false response
+     */
     public boolean cancelAddBook(){
         return !(JOptionPane.showConfirmDialog(null, "Book with title already exists! Continue anyway?") == JOptionPane.YES_OPTION);
     }
 
+    /**
+     * Shows paying fine interface
+     * @param loan the loan with the fine to be paid
+     * @return whether the fine was paid or not (true/false)
+     */
     public boolean paidFine(Loan loan){
         int result = JOptionPane.showConfirmDialog(null,
                 "You have an outstanding fine of: " + MiscOperations.fineToString(loan.getFine()) + "\nPay now?");
@@ -543,6 +619,10 @@ public class Main {
         return false;
     }
 
+    /**
+     * Shows a dialog box with a given message
+     * @param message
+     */
     public void showMessage(String message){
         JOptionPane.showMessageDialog(null, message);
     }

@@ -35,7 +35,7 @@ public class MiscOperations {
     }
 
     /**
-     * takes a file name/ path of a file containing member information in the form:
+     * Takes a file name/ path of a file containing member information in the form:
      * memberID, firstName, LastName, registrationDate 
      * for limitations on these please refer to Member. The return is a 
      * List&ltMember&rt containing all members and their respective information 
