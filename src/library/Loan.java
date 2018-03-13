@@ -60,31 +60,62 @@ public class Loan {
                 borrowDate.toString()};
         return data;
     }
-
+    
+    /**
+     * Getter for the unique Loan ID
+     * @return loan ID of the object
+     */
     public int getLoanID(){
         return loanID;
     }
-
+    
+    /**
+     * Getter for the unique book ID concerned with this loan.
+     * @see class Book
+     * @return unique book ID
+     */
     public int getBookID(){
         return bookID;
     }
 
+    /**
+     * Getter for the unique member ID concerned with this loan.
+     * @see class Member
+     * @return unique member ID
+     */
     public int getMemberID(){
         return memberID;
     }
-
+    /**
+     * Getter for the borrow date of the loan in a LocalDate object
+     * @return borrow date
+     */
     public LocalDate getBorrowDate() {
         return borrowDate;
     }
 
+    /**
+     * Getter for the return date of a loan as a LocalDate object
+     * @return return date of the loan
+     */
     public LocalDate getReturnDate() {
         return returnDate;
     }
-
+    
+    /**
+     * This function returns the fine due for a borrow date using calculateFine from MiscOperations.
+     * @see MiscOperations
+     * @return fine in a floating point format 
+     */
     public double getFine(){
         return MiscOperations.calculateFine(borrowDate);
     }
-
+    
+    /**
+     * formedString produces a console formatted output of the loan data:
+     * Loan ID, Book ID, MemberID, BorrowDate, Return date, latefine
+     * @return a concatenated string containing book information
+     */
     public String formedString(){
         String returnString = String.format("Loan ID: %d " +
                         "\nBook ID: %d " +
@@ -100,7 +131,12 @@ public class Loan {
                         MiscOperations.fineToString(getFine()));
         return returnString;
     }
-
+    
+    /**
+     * returns a string with the loan data, which is formated for file output
+     * @override Object.toString()
+     * @return a String of the loan data, commaseperated
+     */
     @Override
     public String toString(){
         return String.join(",", formatData());
