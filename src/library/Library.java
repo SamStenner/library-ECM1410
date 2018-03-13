@@ -13,56 +13,22 @@ import java.util.List;
  * @author Sam Stenner, Max Prüstel
  */
 public class Library {
-    /**
-     * The Main Form attribute to access the GUI
-     */
+   
     private Main GUI;
-    
-    /**
-     * The list that stores all books in the library
-     */
+
     private List<Book> bookshelf = new ArrayList<>();
-    
-    /**
-     * The list that stores all members of the library
-     */
     private List<Member> memberList = new ArrayList<>();
-    
-    /**
-     * The list that stores all current loan activity
-     */
     private List<Loan> loanList = new ArrayList<>();
-    
-    /**
-     * A value HashMap to determine how many copies of a book are currently 
-     * on loan.
-     */
+
     private HashMap<Book, Integer> BookLoanQuant = new HashMap<>();
-    
-    /**
-     * The file path for the book information data file.
-     */
+
     private String bookPath;
-    
-    /**
-     * The file path for the member information file.
-     */
     private String memberPath;
-    
-    /**
-     * The file path for the loan information file.
-     */
     private String loanPath;
     
-    /**
-     * enum-like global variables for use in the payment system.
-     */
     private static final int METHOD_CASH = 0;
     private static final int METHOD_CARD = 1;
     
-    /**
-     * boolean on whether to use the GUI
-     */
     private boolean usingGUI = false;
     
     /**

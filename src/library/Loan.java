@@ -6,31 +6,10 @@ import java.time.LocalDate;
  * @author Sam Stenner, Max Prüstel
  */
 public class Loan {
-    /**
-     * the unique ID for a Loan in the integer form of 3XXXXX
-     */
     private int loanID;
-    
-    /**
-     * the unique ID of the book to be lent 
-     * @see class Book
-     */
     private int bookID;
-    
-    /**
-     * the unique ID of the member requesting the loan.
-     * @see class Member
-     */
     private int memberID;
-    
-    /**
-     * A LocalDate object containing the date of the loan taken out.
-     */
     private LocalDate borrowDate;
-    
-    /**
-     * A LocalDate object containing the return date of the loan.
-     */
     private LocalDate returnDate;
     
     /**

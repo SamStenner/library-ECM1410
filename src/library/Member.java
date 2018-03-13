@@ -6,24 +6,10 @@ import java.time.LocalDate;
  * @author Sam Stenner, Max Prüstel
  */
 public class Member {
-    /**
-     * The unique Member ID, formed by a 6 digit number starting with 2 
-     */
+
     private int memberID;
-    
-    /**
-     * The first Name of the member.
-     */
     private String foreName;
-    
-    /**
-     * The last name of the member.
-     */
     private String lastName;
-    
-    /**
-     * The date this members acount was activated
-     */
     private LocalDate registerDate;
     
     /**

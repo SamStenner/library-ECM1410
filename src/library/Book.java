@@ -7,31 +7,11 @@ import java.util.List;
  * @version 1
  */
 public class Book {
-    /**
-     * A unique identifier for a book, in the integer form 1XXXXX
-     */
-    private int bookID;
-    
-    /**
-     * A String containing the book title
-     */
+
+    private int bookID;  
     private String bookTitle;
-    
-    /**
-     * Due to the possibility of having multiple authors for a single book they 
-     * are saved in a string array. 
-     */
     private String[] bookAuthors;
-    
-    /**
-     * The Year the book was published in.
-     */
     private int publishYear;
-    
-    /**
-     * The total number of books the library has, uninfluenced by the number of 
-     * loans.
-     */
     private int quantityTotal;
     
     /**
