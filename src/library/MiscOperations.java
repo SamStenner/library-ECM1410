@@ -119,11 +119,16 @@ public class MiscOperations {
         }
     }
     
-    public static String getInput() throws InputException{
+    public static String getInput(String message) throws InputException{
+
+        if (message != null) {
+            System.out.println(message);
+        }
         Scanner input = new Scanner(System.in);
         String query = "";
         try{
             query = input.nextLine();
+            return query;
         }
         catch (NoSuchElementException ex){
             throw new InputException("An error occured while waiting for input."
@@ -133,9 +138,10 @@ public class MiscOperations {
             throw new InputException("An error occured while waiting for input."
                     + "\nYou may be redirected.", null);
         }
-        finally{
-            return query;
-        }
+    }
+
+    public static String getInput() throws InputException{
+        return getInput(null);
     }
 
     public static double calculateFine(LocalDate borrowDate){

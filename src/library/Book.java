@@ -66,7 +66,7 @@ public class Book {
         return quantity;
     }
 
-    public String toString(List<Loan> loanList) {
+    public String formedString(List<Loan> loanList) {
         String returnString = String.format("Book ID: %d "
                 + "\nTitle: %s "
                 + "\nAuthors: %s "
