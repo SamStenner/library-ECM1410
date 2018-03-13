@@ -4,6 +4,9 @@ import javax.swing.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 
+/**
+ * GUI Class for the add book dialog
+ */
 public class AddBook {
 
     //region Used UI Elements
@@ -23,9 +26,18 @@ public class AddBook {
     private JLabel lblQuantity;
     //endregion
 
+    /**
+     * The constructor for the AddBook dialog
+     * @param lib the library to add the book to
+     * @param thisFrame the window on which the dialog will be based
+     * @param main the main frame
+     */
     public AddBook(Library lib, JFrame thisFrame, Main main) {
 
         btnSubmit.addActionListener(new ActionListener() {
+            /**
+             * Action listener for internal class to deal with user input.
+             */
             @Override
             public void actionPerformed(ActionEvent e) {
                 try {
