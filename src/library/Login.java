@@ -20,6 +20,10 @@ public class Login {
     private JLabel lblLogin;
     //endregion
 
+    /**
+     * constructor for the login interface, creates listeners for UI elements
+     * @param main
+     */
     public Login(Main main){
 
         btnLogin.addActionListener(new ActionListener() {
@@ -35,6 +39,7 @@ public class Login {
                 main.registerMember(textFirstName.getText(), textLastName.getText());
             }
         });
+
         textLastName.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {

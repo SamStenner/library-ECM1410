@@ -6,38 +6,25 @@ import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-/**
- * This class represents a library system containing books, loan functionalities 
- * and therefore members too.
- * This class further supports console guidance besides regular function calls.
- * @author Sam Stenner, Max Prüstel
- */
+
 public class Library {
-   
+
     private Main GUI;
 
     private List<Book> bookshelf = new ArrayList<>();
     private List<Member> memberList = new ArrayList<>();
     private List<Loan> loanList = new ArrayList<>();
-
     private HashMap<Book, Integer> BookLoanQuant = new HashMap<>();
 
     private String bookPath;
     private String memberPath;
     private String loanPath;
-    
-    private static final int METHOD_CASH = 0;
-    private static final int METHOD_CARD = 1;
-    
+
+    private int METHOD_CASH = 0;
+    private int METHOD_CARD = 1;
+
     private boolean usingGUI = false;
-    
-    /**
-     * The constructor for a library object, with all the information needed to start the library application:
-     * the three files containing the data for the library
-     * @param bookData file path for the book information file
-     * @param memberData file path for the member information file
-     * @param bookLoanData file path for the member information file
-     */
+
     public Library(String bookData, String memberData, String bookLoanData) {
         this.bookPath = bookData;
         this.memberPath = memberData;
@@ -56,12 +43,7 @@ public class Library {
 
 
     //region Book Functions
-    /**
-     * This function searches the bookshelf for a book with a matching ID
-     * @param bookID book ID that is searched for
-     * @see Book
-     * @return Book if a book was found, otherwise null
-     */
+
     public Book searchBook(int bookID) {
         for (Book book : bookshelf) {
             if (book.getBookID() == bookID) {
@@ -71,14 +53,7 @@ public class Library {
         }
         return null;
     }
-    
-    /**
-     * This function searches the bookshelf for books who contain the query 
-     * either in their ID or in their title. It recurses as long as it cant find 
-     * a single matching book
-     * @param query a search string for the books
-     * @return a single book
-     */
+
     public Book searchBook(String query) {
         query = query == null ? "" : query.toLowerCase();
         if (query != null) {
@@ -92,7 +67,7 @@ public class Library {
         }
         System.out.println("\nMatching books:");
         ArrayList<Book> matchingBooks = matchBook(query);
-        if (matchingBooks.isEmpty()) {
+        if (matchingBooks.size() == 0) {
             System.out.println("\nNo book with that name exists");
             if (usingGUI) throw new RuntimeException("Book not found!");
             return null;
@@ -103,24 +78,21 @@ public class Library {
                 if (foundBook) {
                     return searchBook(matchingBooks.get(0).getBookID());
                 }
-            } catch (InputException ex) {
+            } catch (Exception ex) {
                 System.out.println("\nInput error!");
             }
             return null;
         } else {
-            System.out.println("\nPlease refine your search using the list above!");
-            return searchBook();
-
+            try {
+                System.out.println("\nPlease refine your search using the list above!");
+                return searchBook();
+            } catch (Exception ex) {
+                System.out.println("\nInput error!");
+                return null;
+            }
         }
     }
-    
-    /**
-     * This function searches the bookshelf for books who contain the query 
-     * either in their title, authors or ID and has the ability of returning 
-     * multiple books
-     * @param query a search string 
-     * @return a list of books that match the query either fully or partially
-     */
+
     public ArrayList<Book> matchBook(String query){
         ArrayList<Book> matchingBooks = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
@@ -135,15 +107,7 @@ public class Library {
         }
         return matchingBooks;
     }
-    
-    /**
-     * This function allows borrowing a book using the current date as a 
-     * borrowing date
-     * @param bookTitle title of book to be borrowed
-     * @param memberForeName first name of member to take the loan
-     * @param memberLastName last name of member taking the loan
-     * @see Loan
-     */
+
     public void borrowBook(String bookTitle, String memberForeName, String memberLastName){
         try {
             borrowBook(bookTitle, memberForeName, memberLastName, LocalDate.now());
@@ -151,16 +115,7 @@ public class Library {
             throw ex;
         }
     }
-    
-    /**
-     * This function allows borrowing a book including a user defined borrowing 
-     * date 
-     * @param bookTitle title of book to be borrowed
-     * @param memberForeName first name of member to take the loan
-     * @param memberLastName last name of member taking the loan
-     * @param borrowDate borrowing date
-     * @see Loan
-     */
+
     public void borrowBook(String bookTitle, String memberForeName, String memberLastName, LocalDate borrowDate){
         Member member = searchMember(memberForeName, memberLastName);
         if (member != null) {
@@ -174,14 +129,7 @@ public class Library {
             System.out.println("No member found!");
         }
     }
-    
-    /**
-     * This function allows borrowing a book via a book Object and a member ID
-     * @param book the book to be lent
-     * @param memberID the member ID of the member to be lent to
-     * @param borrowDate the date of the loan being taken out
-     * @see Loan
-     */
+
     public void borrowBook(Book book, int memberID, LocalDate borrowDate) {
         if (book != null) {
             int borrowed = MiscOperations.getBooksBorrowed(loanList, memberID);
@@ -206,12 +154,7 @@ public class Library {
             if (usingGUI) throw new RuntimeException("Book does not currently exist in the library!");
         }
     }
-    
-    /**
-     * This function allows to return a book using the loanID and will 
-     * automatically trigger the fine payment if necessary
-     * @param loanID unique Loan number
-     */
+
     public void returnBook(int loanID) {
         int counter = 0;
         for (Loan loan : loanList) {
@@ -237,28 +180,11 @@ public class Library {
         System.out.println("Loan ID not recognised!");
         if (usingGUI) throw new RuntimeException("Loan ID not recognised!");
     }
-    
-    /**
-     * This function allows returning a book using a loan object,  and will
-     * automatically trigger the fine payment if necessary
-     * @param loan Loan object that is concerned
-     */
+
     public void returnBook(Loan loan) {
         returnBook(loan.getLoanID());
     }
 
-    /**
-     * This function allows adding a new book to the library needing the 
-     * following information:
-     * book title, the name(s) of the author(s) , the publicationYear and the 
-     * initial stock quantity
-     * A new book object with a unique book ID will then be added to all 
-     * relevant list.
-     * @param title book title
-     * @param authorNames a string array with the names of the authors
-     * @param publishYear the year of publication for the book
-     * @param quantity the number of books initially supplied to the library
-     */
     public void addNewBook(String title, String[] authorNames, int publishYear, int quantity) {
         if (title.length() == 0) {
             System.out.println("\nBook must have a title!");
@@ -299,10 +225,6 @@ public class Library {
         }
     }
 
-    /**
-     * This procedure removes a book from the library
-     * @param bookID the unique book ID
-     */
     public void removeBook(int bookID) {
         for (int i = 0; i < bookshelf.size(); i++) {
             if (bookshelf.get(i).getBookID() == bookID){
@@ -322,70 +244,38 @@ public class Library {
 
     }
 
-    /**
-     * This procedure removes a book from the library using a Book object
-     * @param book Book to be deleted
-     */
     public void removeBook(Book book) {
         removeBook(book.getBookID());
     }
 
-    /**
-     * This function changes the quantity of a stocked book, by adding the delta to the current book quantity
-     * @param book a book object which will be altered
-     * @param delta the change in book quantity
-     */
     public void changeQuantity(Book book, int delta) {
         if (book != null) {
             changeQuantity(book.getBookID(), delta);
         }
     }
 
-    /**
-     * This function changes the quantity of a stocked book, by adding the delta
-     * to the current book quantity
-     * @param bookTitle a book title of the book which will be altered
-     * @param delta the change in book quantity
-     */
     public void changeQuantity(String bookTitle, int delta) {
         Book book = searchBook(bookTitle);
         changeQuantity(book, delta);
     }
 
-    /**
-     * This function changes the quantity of a stocked book, by adding the delta
-     * to the current book quantity
-     * @param bookID book ID of the book which will be altered
-     * @param delta the change in book quantity
-     */
     public void changeQuantity(int bookID, int delta) {
         for (Book book : bookshelf) {
             if (book.getBookID() == bookID) {
                 if (book.getAvailable(loanList) + delta >= 0) {
                     book.setQuantity(delta);
-                    MiscOperations.writeData(bookPath, 
-                            MiscOperations.listToString(
-                                    new ArrayList<>(bookshelf)), false);
+                    MiscOperations.writeData(bookPath, MiscOperations.listToString(new ArrayList<>(bookshelf)), false);
                     System.out.println("\nSucessfully changed quantity!");
                     System.out.println("\nNew quantity: " + book.getQuantityTotal() );
                 } else {
-                    System.out.println("\nBook quantity cannot be reduced to "
-                            + "less than zero available books.");
-                    if (usingGUI) throw new RuntimeException("Book quantity "
-                            + "cannot be reduced to less than zero available books.");
+                    System.out.println("\nBook quantity cannot be reduced to less than zero");
+                    if (usingGUI) throw new RuntimeException("Book quantity cannot be reduced to less than zero");
                 }
             }
         }
         loadData();
     }
 
-    /**
-     * This function will set a books quantity to a certain value newQuantity, 
-     * if possible and this wouldnt cause less books to be in the library than 
-     * are currently on loan.
-     * @param book book to be altered
-     * @param newQuantity amount of books to exist 
-     */
     public void setQuantity(Book book, int newQuantity) {
         if (newQuantity - book.getQuantityTotal() + book.getAvailable(loanList) >= 0) {
             System.out.println(newQuantity - book.getQuantityTotal() + book.getAvailable(loanList));
@@ -394,11 +284,7 @@ public class Library {
             throw new RuntimeException("Available quantity cannot be reduced to less than zero");
         }
     }
-    
-    /**
-     * Getter for the overall list of books in the library
-     * @return List&ltBook&rt of all books in the library
-     */
+
     public List<Book> getBookshelf(){
         return bookshelf;
     }
@@ -407,11 +293,6 @@ public class Library {
 
     //region Member Functions
 
-    /**
-     * This function allows searching for a member using it's memberID
-     * @param userID a member ID to search for
-     * @return a matching member object or null
-     */
     public Member searchMember(int userID) {
         for (Member member : memberList) {
             if (member.getID() == userID){
@@ -424,13 +305,6 @@ public class Library {
         return null;
     }
 
-    /**
-     * This function allows searching for a member using it's first and last 
-     * name, and either returns an exact match or asks for a refining search.
-     * @param foreName first name of the member
-     * @param lastName last name of the member
-     * @return a single member who fits the query
-     */
     public Member searchMember(String foreName, String lastName) {
         for (Member member : memberList) {
             if (member.getForeName().toLowerCase().equals(foreName.toLowerCase())
@@ -467,14 +341,7 @@ public class Library {
             }
         }
     }
-    
-    /**
-     * This function allows searching for multiple members who partially fit a 
-     * description of fore and last name
-     * @param foreName first name of the member
-     * @param lastName last name of the member
-     * @return a list of matching members
-     */
+
     public ArrayList<Member> matchMember(String foreName, String lastName) {
         System.out.println("\nPartial Matches");
         ArrayList<Member> matchingFirstNames = matchMember(foreName);
@@ -495,13 +362,7 @@ public class Library {
         }
         return matchingFirstNames;
     }
-    
-    /**
-     * This function allows searching for multiple members who partially fit a 
-     * description in the form of a string
-     * @param query a search string
-     * @return a list of matching members
-     */
+
     public ArrayList<Member> matchMember(String query) {
         ArrayList<Member> members = new ArrayList<>();
         query = query == null ? "" : query.toLowerCase();
@@ -514,15 +375,7 @@ public class Library {
         }
         return members;
     }
-    
-    /**
-     * This function allows adding a new member using his first and last name 
-     * but also a LocalDate object to specify when the registration will be in 
-     * effect.
-     * @param foreName first name of the new member
-     * @param lastName last name of the new member
-     * @param regDate registration date as a LocalDate
-     */
+
     public void addNewMember(String foreName, String lastName,  LocalDate regDate) {
         try {
             if (foreName.length() == 0 || lastName.length() == 0) {
@@ -543,21 +396,11 @@ public class Library {
             throw ex;
         }
     }
-    
-    /**
-     * Getter for the overall list of loans in the library
-     * @return list of loans in the library
-     */
+
     public List<Loan> getLoanList(){
         return loanList;
     }
-    
-    /**
-     * This function returns a list of all the loan objects taken out by a 
-     * single member with a certain member ID.
-     * @param memberID member ID to be evaluated
-     * @return a list of Loan Objects taken out by that member
-     */
+
     public List<Loan> getMemberLoanList(int memberID){
         ArrayList<Loan> memberLoans = new ArrayList<>();
         for (Loan loan : loanList) {
@@ -567,12 +410,7 @@ public class Library {
         }
         return memberLoans;
     }
-    
-    /**
-     * A console function which prints all loans taken out by a member having 
-     * the memberID.
-     * @param memberID member ID to be evaluated. 
-     */
+
     public void showMemberLoans(int memberID){
         System.out.println("\nMember's Loans:");
         boolean hasLoans = false;
@@ -587,12 +425,7 @@ public class Library {
         }
 
     }
-    
-    /**
-     * This function allows to renew a loan and to thereby reset the 30 day 
-     * return policy.
-     * @param loan Loan to be renewed
-     */
+
     public void renewLoan(Loan loan){
         for (int i = 0; i < loanList.size(); i++) {
             if (loanList.get(i).getLoanID() == loan.getLoanID()) {
@@ -605,11 +438,7 @@ public class Library {
     //endregion
 
     //region Misc
-    /**
-     * This function allows the user to pay his fine by either card or cash
-     * @param loan the book loan to be returned and to be resolved
-     * @param method whether to pay cash or card
-     */
+
     public void payFine(Loan loan, int method) {
         double fine = loan.getFine();
         if (method == this.METHOD_CASH) {
@@ -639,11 +468,7 @@ public class Library {
             }
         }
     }
-    
-    /**
-     * A simple function printing out all the books' informations in the library 
-     * onto the console. 
-     */
+
     public void showAllBooks() {
         System.out.println("All Books:");
         for (Book book : bookshelf) {
@@ -651,11 +476,7 @@ public class Library {
         }
         System.out.println("");
     }
-    
-    /**
-     * A simple function printing out all the members' informations in the library 
-     * onto the console. 
-     */
+
     public void showAllMembers() {
         System.out.println("All Members:");
         for (Member member : memberList) {
@@ -663,11 +484,7 @@ public class Library {
         }
         System.out.println("");
     }
-    
-    /**
-     * A simple function printing out all the loans' informations in the library 
-     * onto the console. 
-     */
+
     public void showAllBookLoans() {
         System.out.println("All Loans:");
         for (Loan loan : loanList) {
@@ -675,12 +492,7 @@ public class Library {
         }
         System.out.println("");
     }
-    
-    /**
-     * A console use function to let the user decide whether to overwrite or 
-     * keep an existing book
-     * @return whether the book is overwritten or not.
-     */
+
     private boolean cancelAddBook(){
         System.out.println("\nBook already exists! Continue anyway? [Y] | [N]");
         try {
@@ -690,13 +502,7 @@ public class Library {
             return true;
         }
     }
-    
-    /**
-     * This function takes a Loan object to let the user know about the fine 
-     * and how to pay it.
-     * @param loan the loan for which the fine will be calculated
-     * @return whether the fine was paid now or not.
-     */
+
     public boolean paidFine(Loan loan){
         System.out.println("You have an outstanding fine of: " + MiscOperations.fineToString(loan.getFine()) + "\nPay now? [Y] | [N]");
         try {
@@ -714,32 +520,17 @@ public class Library {
             return false;
         }
     }
-    
-    /**
-     * This function saves the programs data (books, members, loans) into the 
-     * three locations stated as parameters
-     * @param bookPath location for book information to be saved
-     * @param memberPath location for member information to be saved
-     * @param loanPath  location for loan information to be saved
-     */
+
     public void saveChanges(String bookPath, String memberPath, String loanPath) {
         MiscOperations.writeData(bookPath, MiscOperations.listToString(new ArrayList<>(bookshelf)), false);
         MiscOperations.writeData(memberPath, MiscOperations.listToString(new ArrayList<>(memberList)), false);
         MiscOperations.writeData(loanPath, MiscOperations.listToString(new ArrayList<>(loanList)), false);
     }
-    
-    /**
-     * This procedure saves the data (book, loan and member information) to the 
-     * initally given files
-     */
+
     public void saveChanges() {
         saveChanges(bookPath, memberPath, loanPath);
     }
-    
-    /**
-     * This functions loads data from the files given in the constructor to 
-     * fill the library's internal files
-     */
+
     public void loadData() {
         bookshelf.clear();
         memberList.clear();
@@ -767,10 +558,7 @@ public class Library {
     //endregion
 
     //region Keyboard Input Overloads
-    /**
-     * The console overload for the function borrowBook, allowing the console 
-     * user to borrow a book.
-     */
+
     public void borrowBook() {
         try {
             String bookTitle = MiscOperations.getInput("\nBook Title/ID:");
@@ -782,11 +570,6 @@ public class Library {
         }
     }
 
-    /**
-     * The console overload of the searchBook function allowing a console user 
-     * to search for a book
-     * @return a single book that fullfills the internally entered conditions 
-     */
     public Book searchBook() {
         try {
             String query = MiscOperations.getInput("Book Title/ID:");
@@ -797,12 +580,7 @@ public class Library {
             return null;
         }
     }
-    
-    /**
-     * The console overload of the searchMember function allowing a console user 
-     * to search for a member
-     * @return a single member that fullfills the internally entered conditions
-     */
+
     public Member searchMember() {
         try {
             String memberFirstName = MiscOperations.getInput("\nFirst Name:");
@@ -813,11 +591,7 @@ public class Library {
             return null;
         }
     }
-    
-    /**
-     * The console overload of the returnBook function allowing a console user 
-     * to return a book
-     */
+
     public void returnBook() {
         try {
             String loanID = MiscOperations.getInput("\nLoan ID:");
@@ -826,11 +600,7 @@ public class Library {
             System.out.println("Error");
         }
     }
-    
-    /**
-     * The console overload of the addNewBook function allowing a console user 
-     * to add a book  to the library
-     */
+
     public void addNewBook() {
         try {
             String bookTitle = MiscOperations.getInput("\nBooks Title:");
@@ -846,11 +616,7 @@ public class Library {
             System.out.println("Error");
         }
     }
-    
-    /**
-     * The console overload of the addNewMember function allowing a console user 
-     * to add a new member
-     */
+
     public void addNewMember() {
         try {
             String firstName = MiscOperations.getInput("\nFirst Name:");
@@ -866,10 +632,7 @@ public class Library {
             System.out.println("Error");
         }
     }
-    /**
-     * The console overload of the change quantity function allowing a console user 
-     * to change the total stock quantity of a book
-     */
+
     public void changeQuantity() {
         try {
             String query = MiscOperations.getInput("\nBook Title/ID:");
@@ -888,9 +651,7 @@ public class Library {
     }
 
     //endregion
-    /**
-     * the main function for starting the GUI use.
-     */
+
     public void showGUI(){
         try {
             UIManager.setLookAndFeel(UIManager.getInstalledLookAndFeels()[1].getClassName());

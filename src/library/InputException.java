@@ -8,7 +8,7 @@ package library;
  */
 class InputException extends Exception {
     /**
-     * constructor that has to be added to allow paramterless instantiations
+     * Constructor that has to be added to allow paramterless instantiations
      */
     public InputException(){
         super();
@@ -24,7 +24,7 @@ class InputException extends Exception {
     
     /**
      * Constructor that takes a message to be saved in the message attribute and 
-     * a Throwable object in the cause attribute.
+     * A Throwable object in the cause attribute.
      * @param message Error message to be saved.
      * @param cause different exception that caused the exception to come into existance
      */

@@ -36,6 +36,12 @@ public class LoanInfo {
     private JButton closeDetailsButton;
     //endregion
 
+    /**
+     * constructor for the loan info object
+     * @param loan the subject loan
+     * @param book the corresponding book
+     * @param member the corresponding member
+     */
     public LoanInfo(Loan loan, Book book, Member member) {
 
         lblLoanID.setText(Integer.toString(loan.getLoanID()));
@@ -50,6 +56,10 @@ public class LoanInfo {
 
     }
 
+    /**
+     * displays the data about the fine
+     * @param loan
+     */
     public void calculate(Loan loan){
         LocalDate borrowDate = loan.getBorrowDate();
         LocalDate returnDate = borrowDate.plusDays(30);

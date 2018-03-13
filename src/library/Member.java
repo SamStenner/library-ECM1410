@@ -6,12 +6,15 @@ import java.time.LocalDate;
  * @author Sam Stenner, Max Prüstel
  */
 public class Member {
-
+    // The unique Member ID, formed by a 6 digit number starting with 2
     private int memberID;
+    // The first Name of the member.
     private String foreName;
+    // The last name of the member.
     private String lastName;
+    // The date this members account was activated
     private LocalDate registerDate;
-    
+
     /**
      * The constructor, taking all relevant information for the creation of a 
      * member object.
@@ -101,7 +104,7 @@ public class Member {
     /**
      * returns a string with the member data, which is formated for file output
      * @override Object.toString()
-     * @return a String of the member data, commaseperated
+     * @return a String of the member data, comma seperated
      */
     @Override
     public String toString(){

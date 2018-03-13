@@ -7,11 +7,15 @@ import java.util.List;
  * @version 1
  */
 public class Book {
-
-    private int bookID;  
+    // A unique identifier for a book, in the integer form 1XXXXX
+    private int bookID;
+    // The book title
     private String bookTitle;
+    // The list of authors of the book
     private String[] bookAuthors;
+    // The year the book was published
     private int publishYear;
+    // The total number of books the library has, uninfluenced by the number of loans
     private int quantityTotal;
     
     /**
@@ -31,6 +35,11 @@ public class Book {
         this.quantityTotal = quantity;
     }
 
+    /**
+     * gets a string of the book's data in a nicer format
+     * @param loanList the list of loans
+     * @return the book data
+     */
     public String[] formatData(List<Loan> loanList) {
         String[] data = {Integer.toString(bookID),
             bookTitle,
@@ -40,8 +49,9 @@ public class Book {
             Integer.toString(quantityTotal)};
         return data;
     }
+
     /**
-     * Getter for the book ID
+     * getter for the book ID
      * @return the unique book ID number
      */
     public int getBookID() {
@@ -49,7 +59,7 @@ public class Book {
     }
 
     /**
-     * Getter for the book title
+     * getter for the book title
      * @return title of the book
      */
     public String getBookTitle() {
