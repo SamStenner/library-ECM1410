@@ -442,31 +442,32 @@ public class Library {
                 return member;
             }
         }
-        ArrayList<Member> listMembers = matchMember(foreName,  lastName);
-        if (listMembers.size() == 0) {
-            System.out.println("\nMember not found. Please refine your search!");
-            if (usingGUI) throw new RuntimeException("Member not found!");
-            return null;
-        } else if (listMembers.size() == 1){
-            try {
-                System.out.println("\nNo exact match found. Is this the intended member? [Y] | [N]");
-                boolean foundMember = MiscOperations.getInput().toLowerCase().equals("y");
-                if (foundMember) {
-                    return searchMember(listMembers.get(0).getID());
-                }
-            } catch (Exception ex) {
-                System.out.println("\nInput error!");
-            }
-            return null;
-        } else {
-            try {
-                System.out.println("\nPlease refine your search using the list above!");
-                return searchMember();
-            } catch (Exception ex) {
-                System.out.println("\nInput error!");
+        if (!usingGUI) {
+            ArrayList<Member> listMembers = matchMember(foreName, lastName);
+            if (listMembers.size() == 0) {
+                System.out.println("\nMember not found. Please refine your search!");
+                if (usingGUI) throw new RuntimeException("Member not found!");
                 return null;
+            } else if (listMembers.size() == 1) {
+                try {
+                    System.out.println("\nNo exact match found. Is this the intended member? [Y] | [N]");
+                    boolean foundMember = MiscOperations.getInput().toLowerCase().equals("y");
+                    if (foundMember) {
+                        return searchMember(listMembers.get(0).getID());
+                    }
+                } catch (Exception ex) {
+                    System.out.println("\nInput error!");
+                }
+            } else {
+                try {
+                    System.out.println("\nPlease refine your search using the list above!");
+                    return searchMember();
+                } catch (Exception ex) {
+                    System.out.println("\nInput error!");
+                }
             }
         }
+        return null;
     }
 
     /**
@@ -904,18 +905,4 @@ public class Library {
     }
 
 }
-
-    © 2018 GitHub, Inc.
-            Terms
-            Privacy
-            Security
-            Status
-            Help
-
-            Contact GitHub
-            API
-            Training
-            Shop
-            Blog
-            About
 

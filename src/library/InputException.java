@@ -7,6 +7,7 @@ package library;
  * @author Sam Stenner, Max Prüstel
  */
 class InputException extends Exception {
+
     /**
      * Constructor that has to be added to allow paramterless instantiations
      */
