@@ -4,10 +4,3 @@
 200004,Sally,Piper,2015-03-11
 200005,Ian,Cooper,2016-08-10
 200006,Jordan,Smith,2015-11-18
-200008,Sam,Stenner,2018-02-17
-200009,Max,Prustel,2018-02-17
-200011,John,Ingram,2018-02-20
-200012,Richard,Stenner,2018-02-22
-200013,Sally,Swan,2018-03-12
-200014,Hongping,Cai,2018-03-12
-200015,Hongping,Cai,2018-03-12
